@@ -33,60 +33,72 @@ public class parse{
 	            BufferedReader bufferedReader = 
 	                new BufferedReader(fileReader);
 	            while((line = bufferedReader.readLine()) != null) {
+	            	//take each line in the txt file line by line
 	            	for (String retval: line.split("\n")) {
+	            		//split the line by tabs for each field
 	            		String [] splitter = retval.split("\t", -1);
-	            		//check to see if there are any tabs to separate anything
-	            	if(1==splitter.length){
-	            			writer.println(splitter[0]);
-	            		
-	                 }
-	            		//if there are 2 entities separated by tab
-	            	if(2<=splitter.length){
-	            			//check if there is something in the label field, if there is identify it, if not print out a tab
-	            			if(splitter[0].length()!=0){
+	            		//check to see if the line is a comment
+	            		if(splitter[0].startsWith(".")){
+            					comment++;
+            					String comt = "comment";
+            					comt += comment;
+            					writer.print(comt+"\t");
+            				}
+	            		//otherwise check each field
+	            		else{
+	            			//check to see if there are any tabs to separate anything
+	            			if(1==splitter.length){
+	            				//otherwise print the blank line
+	            				writer.print(splitter[0]);
+	            			}
+	            			//if there are 2 entities separated by tab
+	            			if(2<=splitter.length){
+	            				//check if there is something in the label field, if there is identify it, if not print out a tab
+	            				if(splitter[0].length()!=0){
 		            			label++;
 		            			String labs = "label";
 		            			labs = labs+label;
 		            			writer.print(labs+"\t");
-		            		}
-		            		else{
+	            				}
+	            				else{
 		            			writer.print(splitter[0]+"\t");
-		            		}
-	            			//check if there is anything in the operator field, if there is identify it, if not print out a tab
-		           			if(splitter[1].length()!=0){
-	            				operator++;
-		           				String oprt = "operator";
-		           				oprt = oprt+operator;
-		          				writer.print(oprt+"\t");
-		         			}
-		          			else{
-		          				writer.print("\t");
-		          			}
-	            	}
-	            		//if there are three entities separated by tab
-	            	if(3<=splitter.length ){
-	            			//check if there is anything in the operand field, if there is identify it, if not print out a tab
-	            			if(splitter[2].length()!=0){
-	            				operand++;
-	            				String oprd = "operand";
-	            				oprd += operand;
-	            				writer.print(oprd+"\t");
+	            				}
+	            				//check if there is anything in the operator field, if there is identify it, if not print out a tab
+	            				if(splitter[1].length()!=0){
+	            					operator++;
+	            					String oprt = "operator";
+	            					oprt = oprt+operator;
+	            					writer.print(oprt+"\t");
+	            				}
+	            				else{
+	            					writer.print("\t");
+	            				}
 	            			}
-	            			else{
-	            				writer.print("\t");
+	            			//if there are three entities separated by tab
+	            			if(3<=splitter.length ){
+	            				//check if there is anything in the operand field, if there is identify it, if not print out a tab
+	            				if(splitter[2].length()!=0){
+	            					operand++;
+	            					String oprd = "operand";
+	            					oprd += operand;
+	            					writer.print(oprd+"\t");
+	            				}
+	            				else{
+	            					writer.print("\t");
+	            				}
 	            			}
-	            		}
-	            	//if there are four entities separated by tab
-	            	if(4<=splitter.length){
-	            			//check if there is anything in the comment field, if there is identify it, if not print out a tab
-	            			if(splitter[3].length()!=0){
-	            				comment++;
-	            				String comt = "comment";
-	            				comt += comment;
-	            				writer.print(comt+"\t");
-	            			}
-	            			else{
-	            				writer.print("\t");
+	            			//if there are four entities separated by tab
+	            			if(4<=splitter.length){
+	            				//check if there is anything in the comment field, if there is identify it, if not print out a tab
+	            				if(splitter[3].length()!=0){
+	            					comment++;
+	            					String comt = "comment";
+	            					comt += comment;
+	            					writer.print(comt+"\t");
+	            				}
+	            				else{
+	            					writer.print("\t");
+	            				}
 	            			}
 	            		}
 		           			writer.println("");
