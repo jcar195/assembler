@@ -5,8 +5,11 @@ import java.util.*;
 
 public class main {
 	public static void main(String[] args){
-		String fileName = "control_section.txt";
+		opTab operators = new opTab();
+		String fileName = "functions.txt";
+		symTab symbols = new symTab();
 		parse j = new parse(fileName);
-		j.parser();
+		j.parser(symbols);
+		symbols.printTable();
 	}
 }

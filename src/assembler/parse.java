@@ -23,7 +23,8 @@ public class parse{
 		this.comment = 0;
 	}
 	
-	public void parser(){
+	public void parser(symTab symbols){
+		Integer counter = 0x0;
 		 try {
 	            // FileReader reads text files in the default encoding.
 	            FileReader fileReader = new FileReader(fileName);
@@ -59,6 +60,9 @@ public class parse{
 		            			String labs = "label";
 		            			labs = labs+label;
 		            			writer.print(labs+"\t");
+		            			//add the label to the symbol tables
+		            			symbols.apend(splitter[0], counter);
+		            			
 	            				}
 	            				else{
 		            			writer.print(splitter[0]+"\t");
@@ -69,6 +73,7 @@ public class parse{
 	            					String oprt = "operator";
 	            					oprt = oprt+operator;
 	            					writer.print(oprt+"\t");
+	            					counter += 0x3;
 	            				}
 	            				else{
 	            					writer.print("\t");
@@ -105,8 +110,6 @@ public class parse{
 	            		}
 	            	
 	            }
-	            
-
 	            // Always close files.
 	            bufferedReader.close();         
 	            writer.close();
