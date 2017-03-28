@@ -68,4 +68,33 @@ public class opTab {
 		opTab.add(new op("",,));
 		opTab.add(new op("",,));*/
 	}
+	
+	Boolean hasOp(String check){
+		for(int i = 0; i<opTab.size(); i++){
+			if(opTab.get(i).mnemonic.equals(check)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	Integer getOpcode(String check){
+		for(int i = 0; i<opTab.size(); i++){
+			if(opTab.get(i).mnemonic.equals(check)){
+				return opTab.get(i).opcode;
+			}
+		}
+		//this should not happen
+		return 0;
+	}
+	
+	Integer getFormat(String check){
+		for(int i = 0; i<opTab.size(); i++){
+			if(opTab.get(i).mnemonic.equals(check)){
+				return opTab.get(i).format;
+			}
+		}
+		//this should not happen
+		return 0;
+	}
 }
