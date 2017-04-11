@@ -20,7 +20,6 @@ public class parse{
 	}
 	
 	public void parser(symTab symbols){
-		Integer counter = 0x0;
 		 try {
 	            // FileReader reads text files in the default encoding.
 	            FileReader fileReader = new FileReader(fileName);
@@ -36,7 +35,6 @@ public class parse{
 	            		String [] splitter = retval.split("\t", -1);
 	            		//check to see if the line is a comment
 	            		if(splitter[0].startsWith(".")){
-            					writer.print(splitter[0]+"\t");
             				}
 	            		//otherwise check each field
 	            		else{
@@ -47,6 +45,7 @@ public class parse{
 	            			}
 	            			//if there are at least 3 entities separated by tab
 	            			if(3<=splitter.length){
+	            				writer.print(Integer.toHexString(LOC.locator)+"\t");
 	            				//check if there is something in the label field, if there is identify it, if not print out a tab
 	            				if(splitter[0].length()!=0){
 		            			//add the label to the symbol tables
