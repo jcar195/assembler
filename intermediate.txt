@@ -1,59 +1,57 @@
-label1	operator1	operand1	comment1	
-	operator2	operand2	
-	operator3	operand3	
-label2	operator4	operand4	comment2	
-label3	operator5	operand5	comment3	
-	operator6	operand6	comment4	
-	operator7	operand7	
-	operator8	operand8	comment5	
-	operator9	operand9	comment6	
-	operator10	operand10	comment7	
-label4	operator11	operand11	comment8	
-	operator12	operand12	
-	operator13	operand13	comment9	
-	operator14	operand14	
-	operator15	operand15	comment10	
-	operator16	operand16	comment11	
-label5	operator17	operand17	
-label6	operator18	operand18	comment12	
-	operator19	
-label7	operator20	operand19	comment13	
-label8	operator21	operand20	
-label9	operator22	operand21	
+0	COPY	START	0	.COPY FILE FROM INPUT TO OUTPUT	
+0	FIRST	STL	RETADR	.SAVE RETURN ADDRESS	
+3	CLOOP	JSUB	RDREC	.READ INPUT RECORD	
+6		LDA	LENGTH	.TEST FOR EOF (LENGTH = 0)	
+9		COMP	#0	
+c		JEQ	ENDFIL	.EXIT IF EOF FOUND	
+f		JSUB	WRREC	.WRITE OUTPUT RECORD	
+12		J	CLOOP	.LOOP	
+15	ENDFIL	LDA	=C'EOF'	.INSERT END OF FILE MARKER	
+18		STA	BUFFER	
+1b		LDA	#3	
+1e		STA	LENGTH	
+21		JSUB	WRREC	
+24		J	@RETADR	.RETURN TO CALLER	
+27		USE	CDATA	
+27	RETADR	RESW	1	
+2a	LENGTH	RESW	1	.LENGTH OF RECORD	
+2d		USE	CBLKS	
+2d	BUFFER	RESB	4096	.4096-BYTE BUFFER AREA	
+102d	BUFEND	EQU	*	.FIRST LOCATION AFTER BUFFER	
+102d	MAXLEN	EQU	BUFEND-BUFFER	.MAXIMUM RECORD LENGTH	
 
-label10	operator23	
-comment14	
-comment15	
-comment16	
-	operator24	operand22	
-	operator25	operand23	comment17	
-	operator26	operand24	comment18	
-	operator27	operand25	comment19	
-	operator28	operand26	
-label11	operator29	operand27	comment20	
-	operator30	operand28	comment21	
-	operator31	operand29	comment22	
-	operator32	operand30	comment23	
-	operator33	operand31	comment24	
-	operator34	operand32	comment25	
-	operator35	operand33	comment26	
-	operator36	operand34	
-label12	operator37	operand35	comment27	
-	operator38		comment28	
-label13	operator39	operand36	comment29	
-label14	operator40	operand37	
 
-label15	operator41	
-comment30	
-comment31	
-comment32	
-	operator42	operand38	
-	operator43	operand39	comment33	
-	operator44	operand40	
-label16	operator45	operand41	comment34	
-	operator46	operand42	comment35	
-	operator47	operand43	comment36	
-	operator48	operand44	comment37	
-	operator49	operand45	
-	operator50		comment38	
-	operator51	operand46	
+
+102d		USE		
+102d	RDREC	CLEAR	X	.CLEAR LOOP COUNTER	
+102f		CLEAR	A	.CLEAR A TO ZERO	
+1031		CLEAR	S	.CLEAR S TO ZERO	
+1033		+LDT	#MAXLEN	
+1037	RLOOP	TD	INPUT	.TEST INPUT DEVICE	
+103a		JEQ	RLOOP	LOOP UNTIL READY	
+103d		RD	INPUT	.READ CHARACTER INTO REGISTER A	
+1040		COMPR	A,S	.TEST FOR END OF RECORD (X'00')	
+1042		JEQ	EXIT	.EXIT LOOP IF EOR	
+1045		STCH	BUFFER,X	.STORE CHARACTER IN BUFFER	
+1048		TIXR	T	.LOOP UNLESS MAX LENGTH HAS BEEN REACHED	
+104a		JLT	RLOOP	
+104d	EXIT	STX	LENGTH	.SAVE RECORD LENGTH	
+1050		RSUB		RETURN TO CALLER	
+1050		USE	CDATA	
+1050	INPUT	BYTE	X'F1'	.CODE FOR INPUT DEVICE	
+
+
+
+1050		USE		
+1050	WRREC	CLEAR	X	.CLEAR LOOP COUNTER	
+1052		LDT	LENGTH	
+1055	WLOOP	TD	=X'05'	.TEST INPUT DEVICE	
+1058		JEQ	WLOOP	.LOOP UNTIL READY	
+105b		LDCH	BUFFER,X	.GET CHARACTER FROM BUFFER	
+105e		WD	=X'05'	.WRITE CHARACTER	
+1061		TIXR	T	.LOOP UNTIL ALL CHARACTERS HAVE BEEN WRITTEN	
+1063		JLT	WLOOP	
+1066		RSUB		.RETURN TO CALLER	
+1066		USE	CDATA	
+1066		LTORG		
+1066		END	FIRST	
