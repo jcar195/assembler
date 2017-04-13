@@ -1,6 +1,6 @@
 package assembler;
 
-import java.util.ArrayList;
+//import java.util.ArrayList;
 
 public class objcodegen {
 	
@@ -34,7 +34,7 @@ public class objcodegen {
 	}
 	
 	//Generate object code for formats 3 and 4
-	public String ObjCodeGenerate(Long PC, String operation, String operand, ArrayList<symbol> symTab){
+	public String ObjCodeGenerate(Long PC, String operation, String operand, symTab symtab){
 		opTab optab = new opTab();
 		
 		//initializations for the object code
@@ -53,7 +53,7 @@ public class objcodegen {
 			}
 			
 			//Second byte of the opcode
-			byteTwo = Integer.toHexString(chkIndex(operand, symTab) + 1).toUpperCase();
+			byteTwo = Integer.toHexString(chkIndex(operand, symtab) + 1).toUpperCase();
 			
 			//Order of operations within an operand
 			if(operand.contains("*")){
@@ -100,9 +100,9 @@ public class objcodegen {
 				boolean symbolUsed = false;
 				String operandval = operand.trim().substring(1);
 				//Look through the symbol table and find the operand
-				for(int i = 0; i < symTab.size(); i++){
-		    		if(symTab.get(i).symbolName.equals(operandval)){
-		    			targetAddress = Long.valueOf(symTab.get(i).location);
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(operandval)){
+		    			targetAddress = Long.valueOf(symtab.Get(i).location);
 		    			symbolUsed = true;
 		    		}
 				}
@@ -143,9 +143,9 @@ public class objcodegen {
 				Long targetAddress = 0L;
 				String operandval = operand.trim().substring(1);
 				//Look through the symbol table and find the operand
-				for(int i = 0; i < symTab.size(); i++){
-		    		if(symTab.get(i).symbolName.equals(operandval)){
-		    			targetAddress = Long.valueOf(symTab.get(i).location);
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(operandval)){
+		    			targetAddress = Long.valueOf(symtab.Get(i).location);
 		    		}
 				}
 				
@@ -159,7 +159,7 @@ public class objcodegen {
 			}
 
 			//Indexed addressing
-			else if(chkIndex(operand, symTab).equals(8)){
+			else if(chkIndex(operand, symtab).equals(8)){
 				String indexval = getIndexValue();
 				Long longIndexValue = Long.parseLong(indexval);
 				
@@ -169,9 +169,9 @@ public class objcodegen {
 				String[] ops = operand.split("\\s*,\\s*");
 				String symbol = ops[0].trim();
 				//Look through the symbol table and find the operand
-				for(int i = 0; i < symTab.size(); i++){
-		    		if(symTab.get(i).symbolName.equals(symbol)){
-		    			targetAddress = Long.valueOf(symTab.get(i).location);
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(symbol)){
+		    			targetAddress = Long.valueOf(symtab.Get(i).location);
 		    		}
 				}
 				
@@ -187,9 +187,9 @@ public class objcodegen {
 				Long targetAddress = 0L;
 				String symbol = operand.trim();
 				//Look through the symbol table and find the operand
-				for(int i = 0; i < symTab.size(); i++){
-		    		if(symTab.get(i).symbolName.equals(symbol)){
-		    			targetAddress = Long.valueOf(symTab.get(i).location);
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(symbol)){
+		    			targetAddress = Long.valueOf(symtab.Get(i).location);
 		    		}
 				}
 				
@@ -216,7 +216,7 @@ public class objcodegen {
 			}
 			
 			//Second byte of the op code
-			byteTwo = Integer.toHexString(chkIndex(operand, symTab) + chkRelative(operand, symTab, 3L, PC)).toUpperCase();
+			byteTwo = Integer.toHexString(chkIndex(operand, symtab) + chkRelative(operand, symtab, 3L, PC)).toUpperCase();
 			
 			//Order of operations within an expression
 			if(operand.contains("*")){
@@ -290,9 +290,9 @@ public class objcodegen {
 				boolean symbolUsed = false;
 				String operandval = operand.trim().substring(1);
 				//Look through the symbol table and find the operand
-				for(int i = 0; i < symTab.size(); i++){
-		    		if(symTab.get(i).symbolName.equals(operandval)){
-		    			targetAddress = Long.valueOf(symTab.get(i).location);
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(operandval)){
+		    			targetAddress = Long.valueOf(symtab.Get(i).location);
 		    			symbolUsed = true;
 		    		}
 				}
@@ -328,9 +328,9 @@ public class objcodegen {
 				
 				String operandval = operand.trim().substring(1);
 				//Look through the symbol table and find the operand
-				for(int i = 0; i < symTab.size(); i++){
-		    		if(symTab.get(i).symbolName.equals(operandval)){
-		    			targetAddress = Long.valueOf(symTab.get(i).location);
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(operandval)){
+		    			targetAddress = Long.valueOf(symtab.Get(i).location);
 		    		}
 				}
 				
@@ -344,7 +344,7 @@ public class objcodegen {
 			}
 			
 			//Indexed addressing
-			else if(chkIndex(operand, symTab).equals(8)){
+			else if(chkIndex(operand, symtab).equals(8)){
 				String indexval = getIndexValue();
 				Long longIndexValue = Long.parseLong(indexval);
 							
@@ -352,15 +352,15 @@ public class objcodegen {
 				String[] ops = operand.split("\\s*,\\s*");
 				String symbol = ops[0].trim();
 				//Look through the symbol table and find the operand
-				for(int i = 0; i < symTab.size(); i++){
-		    		if(symTab.get(i).symbolName.equals(symbol)){
-		    			targetAddress = Long.valueOf(symTab.get(i).location);
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(symbol)){
+		    			targetAddress = Long.valueOf(symtab.Get(i).location);
 		    		}
 				}
 				
 				//Compute disp for base relative addressing
 				String display = String.format("%03X", 0);
-				if(chkRelative(operand, symTab, 3L, PC).equals(4)){
+				if(chkRelative(operand, symtab, 3L, PC).equals(4)){
 					Long baseRegister = 0L;
 					String baseval = getBaseValue().trim();
 					
@@ -372,9 +372,9 @@ public class objcodegen {
 					}
 					
 					boolean found = false;
-					for(int i = 0; i < symTab.size(); i++){
-			    		if(symTab.get(i).symbolName.equals(baseval)){
-			    			baseRegister = Long.valueOf(symTab.get(i).location);
+					for(int i = 0; i < symtab.size(); i++){
+			    		if(symtab.Get(i).symbolName.equals(baseval)){
+			    			baseRegister = Long.valueOf(symtab.Get(i).location);
 			    			found = true;
 			    			break;
 			    		}
@@ -401,15 +401,15 @@ public class objcodegen {
 			}
 			
 			//PC relative addressing
-			else if(chkRelative(operand, symTab, 3L, PC).equals(2)){
+			else if(chkRelative(operand, symtab, 3L, PC).equals(2)){
 				PC += 3;
 				
 				Long targetAddress = 0L;
 				String symbol = operand.trim();
 				//Look through the symbol table and find the operand
-				for(int i = 0; i < symTab.size(); i++){
-		    		if(symTab.get(i).symbolName.equals(symbol)){
-		    			targetAddress = Long.valueOf(symTab.get(i).location);
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(symbol)){
+		    			targetAddress = Long.valueOf(symtab.Get(i).location);
 		    		}
 				}
 				
@@ -423,7 +423,7 @@ public class objcodegen {
 			}
 			
 			//Base relative addressing scheme
-			else if(chkRelative(operand, symTab, 3L, PC).equals(4)){			
+			else if(chkRelative(operand, symtab, 3L, PC).equals(4)){			
 				String stringBaseValue = getBaseValue();
 				Long baseRegister = 0L;
 				String baseval = getBaseValue().trim();
@@ -437,9 +437,9 @@ public class objcodegen {
 				}
 				
 				boolean found = false;
-				for(int i = 0; i < symTab.size(); i++){
-		    		if(symTab.get(i).symbolName.equals(baseval)){
-		    			baseRegister = Long.valueOf(symTab.get(i).location);
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(baseval)){
+		    			baseRegister = Long.valueOf(symtab.Get(i).location);
 		    			found = true;
 		    			break;
 		    		}
@@ -454,9 +454,9 @@ public class objcodegen {
 				String[] ops = operand.split("\\s*,\\s*");
 				String symbol = ops[0].trim();
 				//Look through the symbol table and find the operand
-				for(int i = 0; i < symTab.size(); i++){
-		    		if(symTab.get(i).symbolName.equals(symbol)){
-		    			targetAddress = Long.valueOf(symTab.get(i).location);
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(symbol)){
+		    			targetAddress = Long.valueOf(symtab.Get(i).location);
 		    		}
 				}
 				
@@ -472,7 +472,7 @@ public class objcodegen {
 		return objCode;
 	}//end of object code generation
 	
-	public Integer chkIndex(String operand, ArrayList<symbol> symTab){
+	public Integer chkIndex(String operand, symTab symtab){
 		if(chkAddress(operand).equals(1)){
 			return 0;
 		}
@@ -507,12 +507,12 @@ public class objcodegen {
 	}
 	
 	//Checks base/PC relative mode
-	public Integer chkRelative(String operand, ArrayList<symbol> symTab, Long format, Long PC){
+	public Integer chkRelative(String operand, symTab symtab, Long format, Long PC){
 		if(chkAddress(operand).equals(1)){
 			String operandval = operand.trim().substring(1);
 			//operand is #symbol
-			for(int i = 0; i < symTab.size(); i++){
-	    		if(symTab.get(i).symbolName.equals(operandval)){
+			for(int i = 0; i < symtab.size(); i++){
+	    		if(symtab.Get(i).symbolName.equals(operandval)){
 	    			return 2;
 	    		}
 			}
@@ -523,15 +523,15 @@ public class objcodegen {
 		String[] ops = operand.split("\\s*,\\s*");
 		String symbol = ops[0].trim();
 		//Look through the symbol table and find the operand
-		for(int i = 0; i < symTab.size(); i++){
-    		if(symTab.get(i).symbolName.equals(symbol)){
-    			targetAddress = Long.valueOf(symTab.get(i).location);
+		for(int i = 0; i < symtab.size(); i++){
+    		if(symtab.Get(i).symbolName.equals(symbol)){
+    			targetAddress = Long.valueOf(symtab.Get(i).location);
     		}
 		}
 		
 		/*for(int i = 0; i < litTab.size(); i++){
-    		if(litTab.get(i).Operation.equals(operand)){
-    			targetAddress = litTab.get(i).location;
+    		if(litTab.Get(i).Operation.equals(operand)){
+    			targetAddress = litTab.Get(i).location;
     		}
 		}*/
 		
@@ -549,9 +549,9 @@ public class objcodegen {
 		}
 		
 		boolean found = false;
-		for(int i = 0; i < symTab.size(); i++){
-    		if(symTab.get(i).symbolName.equals(baseval)){
-    			baseRegister = Long.valueOf(symTab.get(i).location);
+		for(int i = 0; i < symtab.size(); i++){
+    		if(symtab.Get(i).symbolName.equals(baseval)){
+    			baseRegister = Long.valueOf(symtab.Get(i).location);
     			found = true;
     			break;
     		}

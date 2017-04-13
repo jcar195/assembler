@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 
 public class parse{
 	String fileName;
@@ -20,7 +20,7 @@ public class parse{
 		operators = opers;
 	}
 	
-	public void parser(symTab symbols, ArrayList<symbol> symTab1){
+	public void parser(symTab symbols){
 		 try {
 	            // FileReader reads text files in the default encoding.
 	            FileReader fileReader = new FileReader(fileName);
@@ -54,7 +54,7 @@ public class parse{
 		            			
 		            			//Myson Edit
 		            			//Makeshift addition until I figure out how to pass "symbols" around rest of project
-		            			symTab1.add(new symbol(splitter[0], LOC.locator));
+		            			//symTab1.add(new symbol(splitter[0], LOC.locator));
 		            			
 	            				}
 		            			writer.print(splitter[0]+"\t");

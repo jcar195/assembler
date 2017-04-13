@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 
 public class secondparse {
 	//private Long totalOffset = 0L;
@@ -42,7 +42,7 @@ public class secondparse {
 	}
 		
 	
-	public Boolean assemble(String firstPassOutputFileName, ArrayList<symbol> symtab){	
+	public Boolean assemble(String firstPassOutputFileName, symTab symtab){	
 		
 		BufferedWriter bw = null;
 		BufferedReader reader = null;
