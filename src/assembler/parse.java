@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-//import java.util.ArrayList;
 
 public class parse{
 	String fileName;
@@ -51,11 +50,6 @@ public class parse{
 	            				if(splitter[0].length()!=0){
 		            			//add the label to the symbol tables
 		            			symbols.apend(splitter[0], LOC.locator);
-		            			
-		            			//Myson Edit
-		            			//Makeshift addition until I figure out how to pass "symbols" around rest of project
-		            			//symTab1.add(new symbol(splitter[0], LOC.locator));
-		            			
 	            				}
 		            			writer.print(splitter[0]+"\t");
 	            				//check if there is anything in the operator field, if there is identify it, if not print out a tab

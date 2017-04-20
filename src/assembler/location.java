@@ -25,11 +25,16 @@ public class location {
 			if(operator.equals("RESB")){
 				locator =  locator + Integer.valueOf(operand);
 			}
-			/*circle back to
-			 * if(operator.equals("BYTE")){
-			 
-				
-			}*/
+			if(operator.equals("BYTE")){
+				if(operand.startsWith("C")){
+	    			String substring = operand.substring(2,operand.length() - 1);
+	    			locator = locator + substring.length();
+	    		}
+	    		else if(operand.startsWith("X")){
+	    			String substring = operand.substring(2, operand.length() - 1);
+	    			locator = locator +(substring.length()/2);
+	    		}
+			}
 		}
 	
 	}

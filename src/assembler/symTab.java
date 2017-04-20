@@ -14,14 +14,6 @@ public class symTab {
 		SymTab.add(new symbol(sym, loc));
 	}
 	
-	int size(){
-		return SymTab.size();
-	}
-	
-	symbol Get(int index){
-		return SymTab.get(index);
-	}
-	
 	void printTable(){
 		for (int i = 0; i < SymTab.size(); i++) {
 			System.out.println(SymTab.get(i).symbolName+"\t"+Integer.toHexString(SymTab.get(i).location));
