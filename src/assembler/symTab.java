@@ -38,4 +38,12 @@ public class symTab {
 		//this should not happen
 		return 0;
 	}
+	
+	Integer size(){
+		return SymTab.size();
+	}
+	
+	symbol Get(Integer num){
+		return SymTab.get(num);
+	}
 }

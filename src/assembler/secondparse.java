@@ -1,12 +1,20 @@
+/*
+Author: Myson Burch
+Xukai Zou
+CS 30000
+Assembler Final Project
+2 May 2017
+*/
 package assembler;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+//import java.io.Writer;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 //import java.util.ArrayList;
 
 public class secondparse {
@@ -47,6 +55,29 @@ public class secondparse {
 		BufferedWriter bw = null;
 		BufferedReader reader = null;
 		
+		//header string
+		StringBuilder headerRecord = new StringBuilder();
+		//text record string
+		StringBuilder textRecord = new StringBuilder();
+		//end record string
+		StringBuilder endRecord = new StringBuilder();
+		
+		//maximum in half bits
+		Integer maxrecord = 31;
+		//length of the text record
+		Integer currentLen = 0;
+		//temporary length
+		Integer tempcurrLen = 0;
+		//length of the program
+		Integer totalLen = 0;
+		//temporary object code string
+		StringBuilder tempobjCode = new StringBuilder();
+		
+		//variables to keep track of record components 
+		Integer headerCtr = 0;
+		Long tempLocation = 0L;
+		Long startLoc = 0L;
+		
 		try {
 		    reader = new BufferedReader(new FileReader(firstPassOutputFileName));
 		    String text = null;
@@ -66,7 +97,7 @@ public class secondparse {
     		objcodegen objcodegenerator = new objcodegen();
 
             //boolean to detect the START in the AL
-            Boolean firstLine = true;
+            Boolean firstLine = true;            
             
 		    while ((text = reader.readLine()) != null) {
 		    	//empty input
@@ -88,8 +119,8 @@ public class secondparse {
 		    			}
 		    			text = "\t" + builder.toString();
 		    		}
-		    		bw.write(text);
-		    		bw.newLine();
+		    		/*bw.write(text);
+		    		bw.newLine();*/
 		    		continue;
 		    	}
 		    	
@@ -102,7 +133,7 @@ public class secondparse {
 		    		line.label = "";
 		    		line.comment = "";
 		    		line.location = null;
-		    		bw.write(line.toString());
+		    		//bw.write(line.toString());
 		    		continue;
 		    	}
 		    	
@@ -116,8 +147,14 @@ public class secondparse {
 		    		try{
 		    			String value = line.operand;
 			    		objcodegenerator.setBaseValue(value);
-			    		bw.write(line.toString());
-			    		bw.newLine();
+			    		
+			    		//Write the header record of zeros and length of the file
+			    		//Length of the file will be written later
+			    		//bw.write("H^" + line.label + '\t' + "^" + line.location + "^");
+			    		headerRecord.append("H^" + line.label + '\t' + "^" + String.format("%06X", line.location) + "^");
+			    		//bw.newLine();
+			    		headerCtr = 1;
+			    		startLoc = line.location;
 			    		continue;
 		    		}
 		    		
@@ -131,6 +168,21 @@ public class secondparse {
 		    		}
 		    	}
 		    	
+		    	//else write a empty title Header record
+		    	else{
+		    		if (headerCtr == 0){
+		    			//bw.write("H^" + "DEFAULT" + '\t' + "^" + String.format("%06X",line.location) + "^");
+		    			headerRecord.append("H^" + "DEFAULT" + '\t' + "^" + String.format("%06X",line.location) + "^");
+		    			//bw.newLine();
+		    			headerCtr = 1;
+		    			startLoc = line.location;
+		    		}
+		    	}
+		    	
+		    	//catch for the JST error in the macros.txt file
+		    	if(line.operation.equals("JST")){
+		    		line.operation = "JLT";
+		    	}
 		    	
 		    	//LDX operation
 		    	if(line.operation.equals("LDX") || line.operation.equals("+LDX")){
@@ -146,8 +198,8 @@ public class secondparse {
 		    	
 		    	//END operation
 		    	if(line.operation.equals("END")){
-		    		bw.write(line.toString());
-		    		bw.newLine();
+		    		/*bw.write(line.toString());
+		    		bw.newLine();*/
 		    		continue;
 		    	}
 		    	
@@ -234,30 +286,123 @@ public class secondparse {
 		    		line.objCode = "";
 		    	}
 		    	
-		    	
-		    	
 		    	//error handling
 		    	else{
-		    		System.err.println("Invalid opeartion " + line.operation);
-		    		return false;
+		    		System.err.println("Invalid operation: " + line.operation);
+		    		line.objCode = "";
+		    		//return false;
 		    	}
 		    	
 		    	//use this line to begin generating object program
-	    		bw.write(line.objCode);
-	    		bw.newLine();
-	    		
-		    }//end of reading the file
+		    	//if there is a line that doesn't generate object code or we are at the maximum record length
+		    	if(line.objCode.equals("")|| (currentLen + line.objCode.length() >= 2*maxrecord)){
+		    		//bw.newLine();
+		    		
+		    		//if this line didn't generate object code (multiple times)
+		    		if (line.objCode.equals("")&&currentLen ==0){
+		    			currentLen = 0;
+		    		}
+		    		//this is the first line that didn't generate object code
+		    		else if (line.objCode.equals("")){
+		    			/*bw.write("T^" + String.format("%06X", tempLocation) + "^" 
+		    					+ String.format("%02X",currentLen) + tempobjCode);
+		    			*/
+		    			textRecord.append("T^" + String.format("%06X", tempLocation) + "^" 
+		    					+ String.format("%02X",currentLen) + tempobjCode.toString());
+		    			
+		    			tempobjCode.setLength(0);
+		    			currentLen = 0;
+		    		}
+		    		//otherwise there is overflow and 
+		    		//write what we had to the record and move to the next line
+		    		else {
+		    			/*bw.write("T^" + String.format("%06X", tempLocation) + "^" 
+		    					+ String.format("%02X",currentLen) + tempobjCode);
+		    			*/
+		    			textRecord.append("T^" + String.format("%06X", tempLocation) + "^" 
+		    					+ String.format("%02X",currentLen) + tempobjCode.toString() + '\n');
+		    			
+		    			//bw.newLine();
+		    			
+		    			//store stuff for the portion of code that went over the bound for the next line
+		    			tempLocation = line.location;
+		    			tempobjCode.setLength(0);
+		    			//append new object code
+		    			tempobjCode.append("^"+line.objCode.toString());
+		    			currentLen = 0;
+		    			//increment the length for the current record
+		    			currentLen += line.objCode.length();
+		    		}
+		    		
+		    		//System.out.println(tempobjCode);
+		    		//currentLen = 0;
+		    	}
+		    	else{
+		    		//at the start of a new text record
+		    		if(currentLen == 0){
+		    			//bw.newLine();
+		    			textRecord.append('\n');
+		    			tempobjCode.setLength(0);
+		    			//write the text record
+		    			//bw.write("T^" + String.format("%06X", line.location) + "^");
+		    			//grab a temporary location
+		    			tempLocation = line.location;
+		    			//append new object code
+		    			//bw.write("^"+line.objCode);
+		    			tempobjCode.append("^"+line.objCode.toString());
+		    			//increment the length for the current record
+		    			currentLen += line.objCode.length();
+		    			tempcurrLen = currentLen;
+		    			//increment the total length
+		    			totalLen += line.objCode.length();
+		    		}
+		    		else{
+		    			if(currentLen + line.objCode.length() < 2*maxrecord){
+			    			//append new object code as long as we are within the record length
+			    			//bw.write("^"+line.objCode);
+			    			tempobjCode.append("^"+line.objCode.toString());
+			    			//increment the length for the current record
+			    			currentLen += line.objCode.length();
+			    			tempcurrLen = currentLen;
+			    			//increment the total length
+			    			totalLen += line.objCode.length();
+		    			}	
+		    		}
+		    		
+		    		//bw.write(line.objCode);
+		    		//bw.newLine();
+		    		
+		    	}//end of writing text record
+	    			    		
+		    }//end of reading the file (end of while)
+		    
+		    //just in case we ended the file and did not reach a bound on the length of the record and had object code still to write
+		    if (tempobjCode.length()!=0){
+		    	/*bw.write("T^" + String.format("%06X", tempLocation) + "^" 
+    					+ String.format("%02X",tempcurrLen) + tempobjCode);
+		    	*/
+		    	textRecord.append("T^" + String.format("%06X", tempLocation) + "^" 
+    					+ String.format("%02X",tempcurrLen) + tempobjCode.toString() + '\n');
+		    	
+    			tempobjCode.setLength(0);
+    			currentLen = 0;
+		    }
+		    
+		    headerRecord.append(String.format("%06X", totalLen));
+		    endRecord.append("E^"+String.format("%06X", startLoc));
+		    
+		    /*bw.newLine();
+		    //insert program length and end of record
+		    bw.write("E^"+String.format("%06X", startLoc));*/
+		    
+		    bw.write(headerRecord.toString()+textRecord.toString()+'\n'+endRecord.toString());
+            
 		}
 		
 		//catches for exceptions
-		catch (FileNotFoundException e) {
-		    e.printStackTrace();
-		} 
-		
 		catch (IOException e) {
 		    e.printStackTrace();
-		} 
-		
+		}
 		
 		//close connections
 		finally {
@@ -269,6 +414,27 @@ public class secondparse {
 		    }
 		    catch (IOException e) {}
 		}
+		
+		/*Writer output = null;
+		try {
+			output = new BufferedWriter(new FileWriter(firstPassOutputFileName + ".objprog", true));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			output.append("New Line!");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			output.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		
 		return true;
 	}
 	
