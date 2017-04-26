@@ -15,8 +15,8 @@ import java.io.IOException;
 //import java.io.Writer;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-//import java.util.ArrayList;
 
+//second pass of the assembler
 public class secondparse {
 	//private Long totalOffset = 0L;
 	private Long currentOffset = 0L;
@@ -24,7 +24,7 @@ public class secondparse {
 	//private ControlSection currentControlSection;
 	
 	//Case switch statements for general purpose registers
-	private String GetRegisterValue(String operand){
+	private String getRegVals(String operand){
 		switch (operand) {
 		case "A" :
 			return "0";
@@ -51,7 +51,7 @@ public class secondparse {
 		
 	
 	public Boolean assemble(String firstPassOutputFileName, symTab symtab){	
-		
+		//elements to read and write to the text files
 		BufferedWriter bw = null;
 		BufferedReader reader = null;
 		
@@ -79,13 +79,14 @@ public class secondparse {
 		Long startLoc = 0L;
 		
 		try {
+			//read the immediate file
 		    reader = new BufferedReader(new FileReader(firstPassOutputFileName));
 		    String text = null;
 		    
 		    
 		    // New file with object code extension
 		    File file = new File(firstPassOutputFileName + ".objprog");
-		    
+		    //if file DNE, create one
             if (!file.exists()) {
                 file.createNewFile();
             }
@@ -93,58 +94,27 @@ public class secondparse {
             //elements to write to the new file
             FileWriter fw = new FileWriter(file.getAbsoluteFile());
             bw = new BufferedWriter(fw);
+            
             //create a new object code generator instance
     		objcodegen objcodegenerator = new objcodegen();
 
             //boolean to detect the START in the AL
             Boolean firstLine = true;            
             
+            //while not at the end of the file
 		    while ((text = reader.readLine()) != null) {
 		    	//empty input
 		    	if(text.length() == 0){
 		    		continue;
 		    	}
-		    	
-		    	//comment input
-		    	//if the input starts with a tab then a period or just a period
-		    	if(text.startsWith("\t.") || text.startsWith(".")){
-		    		if(text.startsWith("\t.") && !text.substring(2).startsWith("\t") && !(text.length() == 2)){
-		    			String line[] = text.split("\t");
-		    			line[1] = line[1] + "\t";
-		    			line[2] = line[2] + "\t";
-		    			line[3] = line[3] + "\t" + "\t";
-		    			StringBuilder builder = new StringBuilder();
-		    			for(String s : line) {
-		    			    builder.append(s);
-		    			}
-		    			text = "\t" + builder.toString();
-		    		}
-		    		/*bw.write(text);
-		    		bw.newLine();*/
-		    		continue;
-		    	}
-		    	
+		    		    	
 		    	//parse the line into the components (location, operation etc.)
 		    	firstpassoutput line = new firstpassoutput(text);
-		    	
-		    	//last line of the file
-		    	if(line.operation.equals("")){
-		    		line.operand = "";
-		    		line.label = "";
-		    		line.comment = "";
-		    		line.location = null;
-		    		//bw.write(line.toString());
-		    		continue;
-		    	}
-		    	
-		    	//end of file
-		    	if(line.operation.equals(null)){
-		    		continue;
-		    	}
-		    	
+		    		    		    	
 		    	//look for the START in the file at the beginning
 		    	if(line.operation.equals("START") && firstLine){
 		    		try{
+		    			//grab the operand to set the base value
 		    			String value = line.operand;
 			    		objcodegenerator.setBaseValue(value);
 			    		
@@ -179,27 +149,27 @@ public class secondparse {
 		    		}
 		    	}
 		    	
-		    	//catch for the JST error in the macros.txt file
+		    	//catch for the JST typo error in the macros.txt file
 		    	if(line.operation.equals("JST")){
 		    		line.operation = "JLT";
 		    	}
 		    	
 		    	//LDX operation
 		    	if(line.operation.equals("LDX") || line.operation.equals("+LDX")){
+		    		//initialize with the index register value
 		    		String value = line.operand.substring(1);
 		    		objcodegenerator.setIndexValue(value);
 		    	}
 		    	
 		    	//LDB operation
 		    	if(line.operation.equals("LDB") || line.operation.equals("+LDB")){
+		    		//initialize with the base register value
 		    		String value = line.operand.substring(1);
 		    		objcodegenerator.setBaseValue(value);
 		    	}
 		    	
 		    	//END operation
 		    	if(line.operation.equals("END")){
-		    		/*bw.write(line.toString());
-		    		bw.newLine();*/
 		    		continue;
 		    	}
 		    	
@@ -211,39 +181,29 @@ public class secondparse {
 		    				    		
 	    			//Format 1 (just the opcode as the object code, 1 byte, no memory reference)
 	    			if(currOpTable.getFormat(line.operation).equals(1)){
+	    				//grab hexadecimal value of the opcode
 	    				String hexval = String.format("%02X", opCode);
 	    				line.objCode = hexval;
 		    		}//end of format 1 instructions
 	    			
 		    		//Format 2 (2 bytes, no memory reference)
 		    		if(currOpTable.getFormat(line.operation).equals(2)){
-		    			String hexval = String.format("%02X", opCode);
+	    				//grab hexadecimal value of the opcode
+		    			String hexval = String.format("%02X", opCode);		    			
 		    			
-		    			
+		    			//Go through all the format 2 operations
+		    			//Format 2 operations with one argument
 		    			if(line.operation.equals("CLEAR") || line.operation.equals("TIXR")){
-		    				hexval += GetRegisterValue(line.operand) + "0"; 
+		    				hexval += getRegVals(line.operand) + "0"; 
 		    				line.objCode = hexval;
 		    			}
-		    			
+		    			//Format 2 operations with two arguments
 		    			if(line.operation.equals("ADDR") ||line.operation.equals("DIVR")|| line.operation.equals("COMPR")  ||line.operation.equals("MULR") ||line.operation.equals("SUBR")||line.operation.equals("RMO") ){
 		    				String[] ops = line.operand.split("\\s*,\\s*");
-		    				hexval += GetRegisterValue(ops[0].trim()) + GetRegisterValue(ops[1].trim());
-		    				line.objCode = hexval;
-		    			}
-		    					    			
-		    			if(line.operation.equals("SVC")){
-		    				String[] ops = line.operand.split(",");
-		    				Long r1 = Long.parseLong(GetRegisterValue(ops[1].trim()));
-		    				hexval += r1 + "0";
+		    				hexval += getRegVals(ops[0].trim()) + getRegVals(ops[1].trim());
 		    				line.objCode = hexval;
 		    			}
 		    			
-		    			if(line.operation.equals("SHIFTL") || line.operation.equals("SHIFTR")){
-		    				String[] ops = line.operation.split(",");
-		    				Long r2 = (Long.parseLong(GetRegisterValue(ops[1].trim())) - 1);
-		    				hexval += GetRegisterValue(ops[0].trim()) + r2; 
-		    				line.objCode = hexval;
-		    			}
 		    		}//end of format 2 instructions
 		    		
 			    	//Format 3 (3 bytes, default SIC/XE format)
@@ -264,15 +224,19 @@ public class secondparse {
 		    		//character string literal
 		    		if(line.operation.substring(1).startsWith("C")){
 		    			StringBuffer buffer = new StringBuffer();
+		    			//encode the string into array of bytes
 		    			byte[] bytes = literal.getBytes("US-ASCII");
 		    			for(int i = 0; i < bytes.length; i++){
+		    				//determines the character representation for a specific digit in the specified radix
 		    				buffer.append(Character.forDigit((bytes[i] >> 4) & 0xF, 16));
 		    				buffer.append(Character.forDigit((bytes[i] & 0xF), 16));
 		    			}
+		    			//store that object code
 		    			line.objCode = buffer.toString().toUpperCase();
 		    		}
 		    		//hexadecimal literal
 		    		else if(line.operation.substring(1).toUpperCase().startsWith("X")){
+		    			//store that object code
 		    			line.objCode = literal.toUpperCase();
 		    		}
 		    	}
@@ -289,6 +253,7 @@ public class secondparse {
 		    	//error handling
 		    	else{
 		    		System.err.println("Invalid operation: " + line.operation);
+		    		//set that object code to blank so the assembler completes(even with incorrect object code)
 		    		line.objCode = "";
 		    		//return false;
 		    	}

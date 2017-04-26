@@ -1,7 +1,14 @@
+/*
+Author: Myson Burch
+Xukai Zou
+CS 30000
+Assembler Final Project
+2 May 2017
+*/
+
 package assembler;
 
-//import java.util.ArrayList;
-
+//generate object code for formats 3 and 4
 public class objcodegen {
 	
 	String startAddress = "0";
@@ -42,11 +49,13 @@ public class objcodegen {
 		String byteOne = "";
 		String byteTwo = "";
 		
+		//if extended addressing scheme
 		if(operation.startsWith("+")){
 			String format4Addr = "";
 			
 			//First byte of the opcode
 			Integer opcode = optab.getOpcode(operation.substring(1));
+			//convert the byte to its hexadecimal value
 			byteOne = Integer.toHexString(opcode + chkAddress(operand)).toUpperCase();
 			if(byteOne.length() == 1){	
 				byteOne = "0" + byteOne.toUpperCase();
@@ -60,15 +69,17 @@ public class objcodegen {
 				Long targetAddress = 0L;
 				Long disp = 0L;
 				if(operand.contains("-")){
+					//split the operands 
 	    			String[] ops = operand.split("\\s*-\\s*");
-	    			
+	    			//compute target address and disp
 	    			targetAddress = PC - Long.parseLong(ops[1].trim());;
 	    			disp = targetAddress - PC;
 	    		}
 	    		
 	    		else if(operand.contains("+")){
+	    			//split the operands
 	    			String[] ops = operand.split("\\s*\\+\\s*");
-	    			
+	    			//compute target address and disp
 	    			targetAddress = PC + Long.parseLong(ops[1].trim());;
 	    			disp = targetAddress - PC;
 	    		}
@@ -94,20 +105,21 @@ public class objcodegen {
 			
 			//Immediate addressing
 			else if(chkAddress(operand).equals(1)){
+				//add 4 to the PC
 				PC += 4;
-				
 				Long targetAddress = 0L;
-				boolean symbolUsed = false;
+				boolean symUsed = false;
 				String operandval = operand.trim().substring(1);
 				//Look through the symbol table and find the operand
 				for(int i = 0; i < symtab.size(); i++){
 		    		if(symtab.Get(i).symbolName.equals(operandval)){
+		    			//assign the target address
 		    			targetAddress = Long.valueOf(symtab.Get(i).location);
-		    			symbolUsed = true;
+		    			symUsed = true;
 		    		}
 				}
 				
-				if(symbolUsed){
+				if(symUsed){
 					//Compute disp (location symbol because of immediate addressing)
 					Long disp = targetAddress;
 					String display = String.format("%05X", disp);
@@ -121,6 +133,7 @@ public class objcodegen {
 					Long lon = Long.parseLong(operandval);
 					String str = Long.toHexString(lon);
 					format4Addr = str.toUpperCase();
+					//based on the length, append zeros to match the format
 					if(str.length() == 4){	
 						format4Addr = "0" + str;
 					}
@@ -145,6 +158,7 @@ public class objcodegen {
 				//Look through the symbol table and find the operand
 				for(int i = 0; i < symtab.size(); i++){
 		    		if(symtab.Get(i).symbolName.equals(operandval)){
+		    			//assign the target address
 		    			targetAddress = Long.valueOf(symtab.Get(i).location);
 		    		}
 				}
@@ -171,10 +185,12 @@ public class objcodegen {
 				//Look through the symbol table and find the operand
 				for(int i = 0; i < symtab.size(); i++){
 		    		if(symtab.Get(i).symbolName.equals(symbol)){
+		    			//assign the target address
 		    			targetAddress = Long.valueOf(symtab.Get(i).location);
 		    		}
 				}
 				
+				//calculate the disp
 				Long disp = targetAddress - PC - longIndexValue;
 				String display = String.format("%05X", disp);
 				format4Addr = display;
@@ -189,15 +205,18 @@ public class objcodegen {
 				//Look through the symbol table and find the operand
 				for(int i = 0; i < symtab.size(); i++){
 		    		if(symtab.Get(i).symbolName.equals(symbol)){
+		    			//assign the target address
 		    			targetAddress = Long.valueOf(symtab.Get(i).location);
 		    		}
 				}
 				
+				//calculate disp (no PC/Base relative)
 				Long disp = targetAddress;
 				String display = String.format("%05X", disp);
 				format4Addr = display;
 			}
 		
+			//final object code
 			objCode = byteOne + byteTwo + format4Addr;
 		}//end of extended format
 		
@@ -223,15 +242,17 @@ public class objcodegen {
 				Long targetAddress = 0L;
 				Long disp = 0L;
 				if(operand.contains("-")){
+					//split the operands
 	    			String[] ops = operand.split("\\s*-\\s*");
-	    			
+	    			//compute target address and disp
 	    			targetAddress = PC - Long.parseLong(ops[1].trim());;
 	    			disp = targetAddress - PC;
 	    		}
 	    		
 	    		else if(operand.contains("+")){
+	    			//split the operands
 	    			String[] ops = operand.split("\\s*\\+\\s*");
-	    			
+	    			//compute target address and disp
 	    			targetAddress = PC + Long.parseLong(ops[1].trim());;
 	    			disp = targetAddress - PC;
 	    		}
@@ -248,6 +269,7 @@ public class objcodegen {
 			else if(operation.equals("RSUB")){
 				format3Addr = getStartAddress();
 				byteTwo = "";
+				//based on the length, append certain number of zeros for formatting
 				if(format3Addr.length() == 2){	
 					format3Addr = "00" + format3Addr;
 				}
@@ -283,21 +305,21 @@ public class objcodegen {
 			
 			//Immediate addressing
 			else if(chkAddress(operand).equals(1)){
-				PC += 3;
-				
-				Long targetAddress = 0L;
-				
-				boolean symbolUsed = false;
+				//add 3 to PC
+				PC += 3;				
+				Long targetAddress = 0L;				
+				boolean symUsed = false;
 				String operandval = operand.trim().substring(1);
 				//Look through the symbol table and find the operand
 				for(int i = 0; i < symtab.size(); i++){
 		    		if(symtab.Get(i).symbolName.equals(operandval)){
+		    			//assign the target address
 		    			targetAddress = Long.valueOf(symtab.Get(i).location);
-		    			symbolUsed = true;
+		    			symUsed = true;
 		    		}
 				}
 				
-				if(symbolUsed){
+				if(symUsed){
 					//Compute disp
 					Long disp = targetAddress - PC;
 					String display = String.format("%03X", disp);
@@ -311,6 +333,7 @@ public class objcodegen {
 					Long lon = Long.parseLong(operandval);
 					String str = Long.toHexString(lon);
 					format3Addr = str.toUpperCase();
+					//based on the length, append certain number of zeros for formatting
 					if(str.length() == 2){	
 						format3Addr = "0" + str;
 					}
@@ -322,14 +345,14 @@ public class objcodegen {
 			
 			//Indirect addressing
 			else if(chkAddress(operand).equals(2)){
-				PC += 3;
-				
-				Long targetAddress = 0L;
-				
+				//add 3 to the PC
+				PC += 3;				
+				Long targetAddress = 0L;				
 				String operandval = operand.trim().substring(1);
 				//Look through the symbol table and find the operand
 				for(int i = 0; i < symtab.size(); i++){
 		    		if(symtab.Get(i).symbolName.equals(operandval)){
+		    			//assign the target address
 		    			targetAddress = Long.valueOf(symtab.Get(i).location);
 		    		}
 				}
@@ -346,14 +369,14 @@ public class objcodegen {
 			//Indexed addressing
 			else if(chkIndex(operand, symtab).equals(8)){
 				String indexval = getIndexValue();
-				Long longIndexValue = Long.parseLong(indexval);
-							
+				Long longIndexValue = Long.parseLong(indexval);							
 				Long targetAddress = 0L;
 				String[] ops = operand.split("\\s*,\\s*");
 				String symbol = ops[0].trim();
 				//Look through the symbol table and find the operand
 				for(int i = 0; i < symtab.size(); i++){
 		    		if(symtab.Get(i).symbolName.equals(symbol)){
+		    			//assign the target address
 		    			targetAddress = Long.valueOf(symtab.Get(i).location);
 		    		}
 				}
@@ -371,16 +394,17 @@ public class objcodegen {
 						baseval = baseval.substring(1);
 					}
 					
-					boolean found = false;
+					boolean symfound = false;
 					for(int i = 0; i < symtab.size(); i++){
 			    		if(symtab.Get(i).symbolName.equals(baseval)){
+			    			//assign the base register
 			    			baseRegister = Long.valueOf(symtab.Get(i).location);
-			    			found = true;
+			    			symfound = true;
 			    			break;
 			    		}
 					}
 					
-					if(!found){
+					if(!symfound){
 		    			baseRegister = Long.parseLong(baseval);
 					}
 					
@@ -402,13 +426,14 @@ public class objcodegen {
 			
 			//PC relative addressing
 			else if(chkRelative(operand, symtab, 3L, PC).equals(2)){
-				PC += 3;
-				
+				//add 3 to the PC
+				PC += 3;				
 				Long targetAddress = 0L;
 				String symbol = operand.trim();
 				//Look through the symbol table and find the operand
 				for(int i = 0; i < symtab.size(); i++){
 		    		if(symtab.Get(i).symbolName.equals(symbol)){
+		    			//assign the target address
 		    			targetAddress = Long.valueOf(symtab.Get(i).location);
 		    		}
 				}
@@ -423,7 +448,8 @@ public class objcodegen {
 			}
 			
 			//Base relative addressing scheme
-			else if(chkRelative(operand, symtab, 3L, PC).equals(4)){			
+			else if(chkRelative(operand, symtab, 3L, PC).equals(4)){	
+				//grab the base value
 				String stringBaseValue = getBaseValue();
 				Long baseRegister = 0L;
 				String baseval = getBaseValue().trim();
@@ -436,16 +462,17 @@ public class objcodegen {
 					baseval = baseval.substring(1);
 				}
 				
-				boolean found = false;
+				boolean symfound = false;
 				for(int i = 0; i < symtab.size(); i++){
 		    		if(symtab.Get(i).symbolName.equals(baseval)){
+		    			//assign the base register
 		    			baseRegister = Long.valueOf(symtab.Get(i).location);
-		    			found = true;
+		    			symfound = true;
 		    			break;
 		    		}
 				}
 				
-				if(!found){
+				if(!symfound){
 	    			baseRegister = Long.parseLong(baseval);
 				}
 				
@@ -456,6 +483,7 @@ public class objcodegen {
 				//Look through the symbol table and find the operand
 				for(int i = 0; i < symtab.size(); i++){
 		    		if(symtab.Get(i).symbolName.equals(symbol)){
+		    			//assign the target address
 		    			targetAddress = Long.valueOf(symtab.Get(i).location);
 		    		}
 				}
@@ -466,6 +494,7 @@ public class objcodegen {
 				format3Addr = display;
 			}
 
+			//calculate final object code
 			objCode = byteOne + byteTwo+ format3Addr;
 		}
 		
@@ -480,7 +509,7 @@ public class objcodegen {
 		else if(chkAddress(operand).equals(2)){
 			return 0;
 		}
-		
+		//if our operand ends with X then we have indexed addressing
 		else if((operand.trim().toUpperCase()).endsWith("X")){
 			return 8;
 		}
@@ -490,20 +519,21 @@ public class objcodegen {
 	
 	//Determines addressing type based on n/i bits
 	public Integer chkAddress(String operand){
-		Integer addressingval = 0;
+		Integer addrVal = 0;
+		//immediate addressing
 		if((operand.trim().toUpperCase()).startsWith("#")){
-			addressingval = 1 + addressingval;
+			addrVal = 1 + addrVal;
 		}
-		
+		//indirect addressing (2 references)
 		else if((operand.trim().toUpperCase()).startsWith("@")){
-			addressingval = 2 + addressingval;
+			addrVal = 2 + addrVal;
 		}
 		
 		else{
-			addressingval = 3 + addressingval;
+			addrVal = 3 + addrVal;
 		}
 		
-		return addressingval;
+		return addrVal;
 	}
 	
 	//Checks base/PC relative mode
@@ -525,6 +555,7 @@ public class objcodegen {
 		//Look through the symbol table and find the operand
 		for(int i = 0; i < symtab.size(); i++){
     		if(symtab.Get(i).symbolName.equals(symbol)){
+    			//assign the target address
     			targetAddress = Long.valueOf(symtab.Get(i).location);
     		}
 		}
@@ -535,6 +566,7 @@ public class objcodegen {
     		}
 		}*/
 		
+		//define the ranges
 		Long dispPCRange = 0L;
 		dispPCRange = targetAddress - PC + format;
 		
@@ -548,16 +580,17 @@ public class objcodegen {
 			baseval = baseval.substring(1);
 		}
 		
-		boolean found = false;
+		boolean symfound = false;
 		for(int i = 0; i < symtab.size(); i++){
     		if(symtab.Get(i).symbolName.equals(baseval)){
+    			//assign the base register
     			baseRegister = Long.valueOf(symtab.Get(i).location);
-    			found = true;
+    			symfound = true;
     			break;
     		}
 		}
 		
-		if(!found){
+		if(!symfound){
     			baseRegister = Long.parseLong(baseval);
 		}
 		
