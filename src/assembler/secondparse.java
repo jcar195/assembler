@@ -18,10 +18,7 @@ import java.io.BufferedWriter;
 
 //second pass of the assembler
 public class secondparse {
-	//private Long totalOffset = 0L;
 	private Long currentOffset = 0L;
-	//private Boolean knownControlSectionStartingPlace = false;
-	//private ControlSection currentControlSection;
 	
 	//Case switch statements for general purpose registers
 	private String getRegVals(String operand){
@@ -250,9 +247,34 @@ public class secondparse {
 		    		line.objCode = "";
 		    	}
 		    	
+		    	//BYTE operation
+		    	else if(line.operation.equals("BYTE")){
+		    		//if we are storing a character value
+		    		if(line.operand.startsWith("C")){
+		    			//buffer for the object code
+		    			StringBuffer objCodebuffer = new StringBuffer();
+		    			String charSubstring = line.operand.substring(2, line.operation.length() + 1);
+		    			//encode the string into a sequence of bytes
+		    			byte[] bytes = charSubstring.getBytes("US-ASCII");
+		    			//for each byte, append for the object code 
+		    			for(int i = 0; i < bytes.length; i++){
+		    				//determines the character representation for a specific digit in the specified radix
+		    				objCodebuffer.append(Character.forDigit((bytes[i] >> 4) & 0xF, 16));
+		    				objCodebuffer.append(Character.forDigit((bytes[i] & 0xF), 16));
+		    			}
+		    			//final object code
+		    			line.objCode = objCodebuffer.toString().toUpperCase();
+		    		}
+		    		//hexadecimal byte
+		    		else if(line.operand.startsWith("X")){
+		    			String charSubstring = line.operand.substring(2, line.operation.length());
+		    			line.objCode = charSubstring;
+		    		}
+		    	}
+		    	
 		    	//error handling
 		    	else{
-		    		System.err.println("Invalid operation: " + line.operation);
+		    		//System.err.println("Invalid operation: " + line.operation);
 		    		//set that object code to blank so the assembler completes(even with incorrect object code)
 		    		line.objCode = "";
 		    		//return false;
