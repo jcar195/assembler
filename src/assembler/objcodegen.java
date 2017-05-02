@@ -281,28 +281,6 @@ public class objcodegen {
 				}
 			}
 			
-			/*// literal is in operand
-			else if(operand.startsWith("=")){
-				// location operandval operandval in calculation
-				PC += 3;
-				
-				// (TA) operandval in calculation
-				Long targetAddress = 0L;
-				
-				for(int i = 0; i < litTab.size(); i++){
-		    		if(litTab.get(i).Operation.equals(operand)){
-		    			targetAddress = litTab.get(i).PC;
-		    		}
-				}
-				
-				Long disp = targetAddress - PC;
-				String display = String.format("%03X", disp);
-				if(display.length() > 3){
-					display = display.substring(display.length() - 3);
-				}
-				format3Addr = display;	
-			}*/
-			
 			//Immediate addressing
 			else if(chkAddress(operand).equals(1)){
 				//add 3 to PC
