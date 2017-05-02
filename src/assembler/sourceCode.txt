@@ -1,0 +1,1911 @@
+//character.java
+
+package assembler;
+
+public class character {
+	Integer dec;
+	String name;
+	
+	character(Integer d, String n){
+		dec = d;
+		name = n;
+	}
+}
+
+//charTab
+
+package assembler;
+
+import java.util.ArrayList;
+
+public class charTab {
+	ArrayList <character> chars;
+	
+	charTab(){
+		chars = new ArrayList <character>();
+		chars.add(new character(48,"0"));
+		chars.add(new character(49,"1"));
+		chars.add(new character(50,"2"));
+		chars.add(new character(51,"3"));
+		chars.add(new character(52,"4"));
+		chars.add(new character(53,"5"));
+		chars.add(new character(54,"6"));
+		chars.add(new character(55,"7"));
+		chars.add(new character(56,"8"));
+		chars.add(new character(57,"9"));
+		chars.add(new character(58,":"));
+		chars.add(new character(59,";"));
+		chars.add(new character(60,"<"));
+		chars.add(new character(61,"="));
+		chars.add(new character(62,">"));
+		chars.add(new character(63,"?"));
+		chars.add(new character(64,"@"));
+		chars.add(new character(65,"A"));
+		chars.add(new character(66,"B"));
+		chars.add(new character(67,"C"));
+		chars.add(new character(68,"D"));
+		chars.add(new character(69,"E"));
+		chars.add(new character(70,"F"));
+		chars.add(new character(71,"G"));
+		chars.add(new character(72,"H"));
+		chars.add(new character(73,"I"));
+		chars.add(new character(74,"J"));
+		chars.add(new character(75,"K"));
+		chars.add(new character(76,"L"));
+		chars.add(new character(77,"M"));
+		chars.add(new character(78,"N"));
+		chars.add(new character(79,"O"));
+		chars.add(new character(80,"P"));
+		chars.add(new character(81,"Q"));
+		chars.add(new character(82,"R"));
+		chars.add(new character(83,"S"));
+		chars.add(new character(84,"T"));
+		chars.add(new character(85,"U"));
+		chars.add(new character(86,"V"));
+		chars.add(new character(87,"W"));
+		chars.add(new character(88,"X"));
+		chars.add(new character(89,"Y"));
+		chars.add(new character(90,"Z"));
+		chars.add(new character(91,"["));
+		chars.add(new character(92,"\\"));
+		chars.add(new character(93,"]"));
+		chars.add(new character(94,"^"));
+		chars.add(new character(95,"_"));
+		chars.add(new character(96,"`"));
+		chars.add(new character(97,"a"));
+		chars.add(new character(98,"b"));
+		chars.add(new character(99,"c"));
+		chars.add(new character(100,"d"));
+		chars.add(new character(101,"e"));
+		chars.add(new character(102,"f"));
+		chars.add(new character(103,"g"));
+		chars.add(new character(104,"h"));
+		chars.add(new character(105,"i"));
+		chars.add(new character(106,"j"));
+		chars.add(new character(107,"k"));
+		chars.add(new character(108,"l"));
+		chars.add(new character(109,"m"));
+		chars.add(new character(110,"n"));
+		chars.add(new character(111,"o"));
+		chars.add(new character(112,"p"));
+		chars.add(new character(113,"q"));
+		chars.add(new character(114,"r"));
+		chars.add(new character(115,"s"));
+		chars.add(new character(116,"t"));
+		chars.add(new character(117,"u"));
+		chars.add(new character(118,"v"));
+		chars.add(new character(119,"w"));
+		chars.add(new character(120,"x"));
+		chars.add(new character(121,"y"));
+		chars.add(new character(122,"z"));
+		chars.add(new character(123,"{"));
+		chars.add(new character(124,"|"));
+		chars.add(new character(125,"}"));
+		chars.add(new character(126,"~"));
+	}
+	
+	public int getIndex(String c){
+		int b = 0;
+		for(int i = 0; i<chars.size(); i++){
+			character a = chars.get(i);
+			if(c.contentEquals(a.name)){
+				b = i;
+			}
+		}
+		return b;
+	}
+}
+
+//firstpassoutput
+
+/*
+Author: Myson Burch
+Xukai Zou
+CS 30000
+Assembler Final Project
+2 May 2017
+*/
+
+package assembler;
+
+//class to parse the intermediate file from the first parse
+public class firstpassoutput {
+	//label of the instruction
+	String label;
+	//operation of the instruction
+	String operation;
+	//operand(s) of the instruction
+	String operand;
+	//comments for the instruction
+	String comment;
+	//the LOC value for the instruction
+	Long location;
+	//object code for the instruction
+	String objCode;
+
+	//method to parse the line of the instruction
+	public String toString(){
+		//if there is no LOC then just parse and place values into the other parts of the line
+		if(null == location){
+			String output = String.format("%s\t%s\t%s\t%s\t%s\t%s", "", label, operation, operand, objCode, comment);
+			return output;
+		}
+		//parsing the components of the intermediate test file separated by tabs
+		String output = String.format("%04X\t%s\t%s\t%s\t%s\t%s", location, label, operation, operand, objCode, comment);
+		return output;
+	}
+	
+	//constructor
+	firstpassoutput(String text){
+		location = 0L;
+		label = "";
+		operation = "";
+		operand = "";
+		comment = "";
+
+		//parsing the components(lines) of the intermediate test file with an addition of an object code section
+		String[] split = text.split("\t", -1);
+		if(1 <= split.length){
+			if(!split[0].equals("NULL")){
+				location = Long.parseLong(split[0], 16);
+			}
+			else{
+				location = null;
+			}
+		}
+		if(2 <= split.length){
+			label = split[1];
+		}
+		if(3 <= split.length){
+			operation = split[2];
+		}
+		if(4 <= split.length){
+			operand = split[3];
+		}
+		if(5 <= split.length){
+			comment = split[4];
+		}
+		if(6 <= split.length){
+			objCode = split[5];
+		}
+	}
+}	
+
+//location
+
+/*
+Author: John Carillo
+Xukai Zou
+CS 30000
+Assembler Final Project
+2 May 2017
+*/
+
+package assembler;
+
+public class location {
+	Integer locator;
+	
+	location(Integer l){
+		locator = l;
+	}
+	
+	void update(String operator, opTab operators, String operand){
+		if(operators.hasOp(operator)){
+			locator =  locator + operators.getFormat(operator);
+		}
+		else{
+			String hold = operator.substring(0,1);
+			if(hold.equals("+")){
+				locator = locator+4;
+			}
+			if(operator.equals("WORD")){
+				locator = locator+3;
+			}
+			if(operator.equals("RESW")){
+				locator = locator + 3*(Integer.valueOf(operand));
+			}
+			if(operator.equals("RESB")){
+				locator =  locator + Integer.valueOf(operand);
+			}
+			if(operator.equals("BYTE")){
+				if(operand.startsWith("C")){
+	    			String substring = operand.substring(2,operand.length() - 1);
+	    			locator = locator + substring.length();
+	    		}
+	    		else if(operand.startsWith("X")){
+	    			String substring = operand.substring(2, operand.length() - 1);
+	    			locator = locator +(substring.length()/2);
+	    		}
+			}
+		}
+	
+	}
+	
+}
+
+//macro
+
+/*
+Author: John Carillo
+Xukai Zou
+CS 30000
+Assembler Final Project
+2 May 2017
+*/
+
+package assembler;
+
+import java.util.ArrayList;
+
+public class macro {
+	String name;
+	ArrayList <String> params;
+	ArrayList <String> code;
+	macro(String n){
+		name = n;
+		params = new ArrayList<String>();
+		code = new ArrayList<String>();
+	}
+	void addParam(String p){
+		params.add(p);
+	}
+	void addCode(String c){
+		code.add(c);
+	}
+	void printParam(){
+		for(int i=0; i<params.size();i++){
+			System.out.println(params.get(i));
+		}
+	}
+	void printCode(){
+		for(int i=0; i<code.size();i++){
+			System.out.println(code.get(i));
+		}
+	}
+}
+
+//macroProcess
+
+/*
+Author: John Carillo
+Xukai Zou
+CS 30000
+Assembler Final Project
+2 May 2017
+*/
+
+package assembler;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+
+public class macroProcess {
+	macroTab macTab;	
+	String txt;
+	macroProcess(String title){
+			macTab = new macroTab();
+			txt = title;
+	}
+	void macroFirst(){
+		//open the file
+		// FileReader reads text files in the default encoding.
+        try {
+			FileReader fileReader = new FileReader(txt);
+			// Always wrap FileReader in BufferedReader.
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String line;
+			//go line by line
+            Boolean curMac = false;
+            String macTitle = "";
+            while((line = bufferedReader.readLine()) != null) {
+            	String [] retval = line.split("\n");
+            	for (int i = 0; i<retval.length; i++) {
+               		//split the line by tabs for each field
+            		String [] splitter = retval[i].split("\t", -1);
+            		//check to see if the line is a comment
+            		if(splitter[0].startsWith(".")){
+        					//do nothing, just skip it
+        				}
+            		//otherwise check each field
+            		else{
+            			//if there are at least 3 entities separated by tab
+            			if(3<=splitter.length){
+            				if(curMac){
+            					if(splitter[1].equals("MEND")){
+            						curMac = false;
+            						
+            					}
+            					else{
+            						String s="";
+            						for(int j = 0; j<splitter.length;j++){
+            							s+=splitter[j]+"\t";
+            						}
+            						macro m = macTab.getMac(macTitle);
+            						m.addCode(s);
+            					}
+            				}
+            				else{
+            					if(splitter[1].length()!=0){
+            						if(splitter[1].contentEquals("MACRO")){
+            							//get the title
+            							String title;
+            							title = splitter[0];
+            							//create the macro
+            							macro mac = new macro(title);
+            							//get the parameters
+            							String parameters[] = splitter[2].split(",");
+            							for(int a=0; a< parameters.length; a++){
+            								mac.addParam(parameters[a].substring(1));
+            							}
+            							macTitle = title;
+            							curMac = true;
+            							macTab.addMac(mac);
+            						}
+            					}
+            				}
+            			}
+            		}
+            			
+            			
+            	}
+            }
+		//end of first pass
+        //close the file
+        bufferedReader.close();         
+        } catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	} 
+	void macroSecond(){
+		// FileReader reads text files in the default encoding.
+        try {
+			FileReader fileReader = new FileReader(txt);
+			// Always wrap FileReader in BufferedReader.
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            //open the writer
+            PrintWriter writer = new PrintWriter("expanded.txt");
+            String line;
+            boolean isMac = false;
+            //go line by line
+            while((line = bufferedReader.readLine()) != null) {
+            	String [] retval = line.split("\n");
+            	for (int i = 0; i<retval.length; i++) {
+            		//split the line by tabs for each field
+            		String [] splitter = retval[i].split("\t", -1);
+            		//check to see if the line is a comment
+            		if(splitter[0].startsWith(".")){
+        					//do nothing, just skip it
+        			}
+            		else{
+            			if(3<=splitter.length){
+            				if(splitter[1].contentEquals("MACRO")){
+            					isMac = true;
+            				}
+            				if(!isMac){	
+            					//check to see if it is a macro call
+            					if(macTab.isMacro(splitter[1])){
+            						//if it is, print out the code to the file
+            						writer.print(splitter[0]);
+            						ArrayList <String> p = getParams(splitter[2]);
+            						macro m = macTab.getMac(splitter[1]);
+            						for(int j=0; j<m.code.size();j++){
+            							String a = m.code.get(j);
+            							a = retParams(a, m.params, p);
+            							writer.println(a);
+            						}
+            					}
+            					else{
+            						//if not, just put the current code in the file
+            						for(int j = 0; j<splitter.length; j++){
+            							writer.print(splitter[j]+"\t");
+            						}
+            					}
+            				}
+            				if(splitter[1].contentEquals("MEND")){
+            					isMac = false;
+            				}
+            			}
+            		}
+            		if(!isMac){
+            		writer.println("");
+            		}
+            	}
+            }
+		//close the file
+        bufferedReader.close(); 
+        //close the writer
+        writer.close();
+        } catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	ArrayList<String> getParams(String m){
+		ArrayList <String>  params = new ArrayList <String>(); 
+		String split[] = m.split(",");
+		for(int i = 0; i< split.length; i++){
+			String p = split[i];
+			params.add(p);
+			System.out.println(p);
+		}
+		System.out.println("");
+		return params;
+	}
+
+	String retParams (String m, ArrayList<String> macP, ArrayList<String> p){
+		String a = "";
+		if(m.contains("&")){
+			for(int i = 0; i < macP.size(); i++){
+				if(m.contains(macP.get(i))){
+					String x = "&"+macP.get(i);
+					m = m.replaceAll(x, p.get(i));
+				}
+			}
+		}
+		a = m;
+		return a;
+	}
+}
+	
+
+//macroTab
+
+/*
+Author: John Carillo
+Xukai Zou
+CS 30000
+Assembler Final Project
+2 May 2017
+*/
+
+package assembler;
+
+import java.util.ArrayList;
+
+public class macroTab {
+	ArrayList <macro> macTab;
+	macroTab(){	
+		macTab = new ArrayList <macro>();
+	}
+	Boolean hasMac(String check){
+		for(int i = 0; i<macTab.size(); i++){
+			if(macTab.get(i).name.equals(check)){
+				return true;
+			}
+		}
+		return false;
+	}
+	void addMac(macro m){
+		macTab.add(m);
+	}
+	macro getMac(String m){
+		for(int i=0; i<macTab.size();i++){
+			if(macTab.get(i).name.equals(m)){
+				return macTab.get(i);
+			}
+		}
+		//this should never happen
+		return new macro("wrong");
+		
+	}
+	boolean isMacro(String s){
+		for(int i=0; i<macTab.size(); i++){
+			if(macTab.get(i).name.equals(s)){
+				return true;
+			}
+		}
+		return false;
+	}
+}
+
+//main
+
+/*
+Author: John Carillo
+Xukai Zou
+CS 30000
+Assembler Final Project
+2 May 2017
+*/
+
+package assembler;
+
+import java.util.ArrayList;
+
+public class macroTab {
+	ArrayList <macro> macTab;
+	macroTab(){	
+		macTab = new ArrayList <macro>();
+	}
+	Boolean hasMac(String check){
+		for(int i = 0; i<macTab.size(); i++){
+			if(macTab.get(i).name.equals(check)){
+				return true;
+			}
+		}
+		return false;
+	}
+	void addMac(macro m){
+		macTab.add(m);
+	}
+	macro getMac(String m){
+		for(int i=0; i<macTab.size();i++){
+			if(macTab.get(i).name.equals(m)){
+				return macTab.get(i);
+			}
+		}
+		//this should never happen
+		return new macro("wrong");
+		
+	}
+	boolean isMacro(String s){
+		for(int i=0; i<macTab.size(); i++){
+			if(macTab.get(i).name.equals(s)){
+				return true;
+			}
+		}
+		return false;
+	}
+}
+
+//objcodegen
+
+/*
+Author: Myson Burch
+Xukai Zou
+CS 30000
+Assembler Final Project
+2 May 2017
+*/
+
+package assembler;
+
+//generate object code for formats 3 and 4
+public class objcodegen {
+	
+	String startAddress = "0";
+	String indexval = "0";
+	String baseval = "0";
+	
+	//getters and setters for the base, index and starting values
+	public void setBaseValue(String baseval){
+		this.baseval = baseval;
+	}
+	
+	public String getBaseValue(){
+		return baseval;
+	}
+	
+	public void setIndexValue(String indexval){
+		this.indexval = indexval;
+	}
+	
+	public String getIndexValue(){
+		return indexval;
+	}
+	
+	public void setStartAddress(String startAddress){
+		this.startAddress = startAddress;
+	}
+	
+	public String getStartAddress(){
+		return startAddress;
+	}
+	
+	//Generate object code for formats 3 and 4
+	public String ObjCodeGenerate(Long PC, String operation, String operand, symTab symtab){
+		opTab optab = new opTab();
+		
+		//initializations for the object code
+		String objCode = "";
+		String byteOne = "";
+		String byteTwo = "";
+		
+		//if extended addressing scheme
+		if(operation.startsWith("+")){
+			String format4Addr = "";
+			
+			//First byte of the opcode
+			Integer opcode = optab.getOpcode(operation.substring(1));
+			//convert the byte to its hexadecimal value
+			byteOne = Integer.toHexString(opcode + chkAddress(operand)).toUpperCase();
+			if(byteOne.length() == 1){	
+				byteOne = "0" + byteOne.toUpperCase();
+			}
+			
+			//Second byte of the opcode
+			byteTwo = Integer.toHexString(chkIndex(operand, symtab) + 1).toUpperCase();
+			
+			//Order of operations within an operand
+			if(operand.contains("*")){
+				Long targetAddress = 0L;
+				Long disp = 0L;
+				if(operand.contains("-")){
+					//split the operands 
+	    			String[] ops = operand.split("\\s*-\\s*");
+	    			//compute target address and disp
+	    			targetAddress = PC - Long.parseLong(ops[1].trim());;
+	    			disp = targetAddress - PC;
+	    		}
+	    		
+	    		else if(operand.contains("+")){
+	    			//split the operands
+	    			String[] ops = operand.split("\\s*\\+\\s*");
+	    			//compute target address and disp
+	    			targetAddress = PC + Long.parseLong(ops[1].trim());;
+	    			disp = targetAddress - PC;
+	    		}
+				
+				String display = String.format("%05X", disp);
+				if(display.length() > 3){
+					display = display.substring(display.length() - 5);
+				}
+				
+				format4Addr = display.toUpperCase();
+			}//end of expression calculation
+			
+			/*// generate address bytes
+			else if(contSects.size() > 1){
+				if(!knownControlSectionStartingPlace){
+					for(int i = 0; i < currentControlSection.ExtRefTab.size(); i++){
+						if(operand.contains(currentControlSection.ExtRefTab.get(i).Label)){
+							format4Addr = "00000";
+						}
+					}
+				}
+			}*/
+			
+			//Immediate addressing
+			else if(chkAddress(operand).equals(1)){
+				//add 4 to the PC
+				PC += 4;
+				Long targetAddress = 0L;
+				boolean symUsed = false;
+				String operandval = operand.trim().substring(1);
+				//Look through the symbol table and find the operand
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(operandval)){
+		    			//assign the target address
+		    			targetAddress = Long.valueOf(symtab.Get(i).location);
+		    			symUsed = true;
+		    		}
+				}
+				
+				if(symUsed){
+					//Compute disp (location symbol because of immediate addressing)
+					Long disp = targetAddress;
+					String display = String.format("%05X", disp);
+					if(display.length() > 5){
+						display = display.substring(display.length() - 5);
+					}
+					format4Addr = display;
+				}
+				
+				else{
+					Long lon = Long.parseLong(operandval);
+					String str = Long.toHexString(lon);
+					format4Addr = str.toUpperCase();
+					//based on the length, append zeros to match the format
+					if(str.length() == 4){	
+						format4Addr = "0" + str;
+					}
+					if(str.length() == 3){	
+						format4Addr = "00" + str;
+					}
+					if(str.length() == 2){	
+						format4Addr = "000" + str;
+					}
+					if(str.length() == 1){	
+						format4Addr = "0000" + str;
+					}
+				} 
+			}
+			
+			//Indirect addressing
+			else if(chkAddress(operand).equals(2)){
+				PC += 4;
+				
+				Long targetAddress = 0L;
+				String operandval = operand.trim().substring(1);
+				//Look through the symbol table and find the operand
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(operandval)){
+		    			//assign the target address
+		    			targetAddress = Long.valueOf(symtab.Get(i).location);
+		    		}
+				}
+				
+				//Compute the disp
+				Long disp = targetAddress - PC;
+				String display = String.format("%05X", disp);
+				if(display.length() > 5){
+					display = display.substring(display.length() - 5);
+				}
+				format4Addr = display;
+			}
+
+			//Indexed addressing
+			else if(chkIndex(operand, symtab).equals(8)){
+				String indexval = getIndexValue();
+				Long longIndexValue = Long.parseLong(indexval);
+				
+				PC += 4;
+				
+				Long targetAddress = 0L;
+				String[] ops = operand.split("\\s*,\\s*");
+				String symbol = ops[0].trim();
+				//Look through the symbol table and find the operand
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(symbol)){
+		    			//assign the target address
+		    			targetAddress = Long.valueOf(symtab.Get(i).location);
+		    		}
+				}
+				
+				//calculate the disp
+				Long disp = targetAddress - PC - longIndexValue;
+				String display = String.format("%05X", disp);
+				format4Addr = display;
+			}
+			
+			//No PC/Base relative 
+			else{
+				PC += 4;
+				
+				Long targetAddress = 0L;
+				String symbol = operand.trim();
+				//Look through the symbol table and find the operand
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(symbol)){
+		    			//assign the target address
+		    			targetAddress = Long.valueOf(symtab.Get(i).location);
+		    		}
+				}
+				
+				//calculate disp (no PC/Base relative)
+				Long disp = targetAddress;
+				String display = String.format("%05X", disp);
+				format4Addr = display;
+			}
+		
+			//final object code
+			objCode = byteOne + byteTwo + format4Addr;
+		}//end of extended format
+		
+		
+		
+		
+		//Format 3 (no extended)
+		else{
+			String format3Addr = "";
+			
+			//First byte of the op code
+			Integer opcode = optab.getOpcode(operation);
+			byteOne = Integer.toHexString(opcode + chkAddress(operand)).toUpperCase();
+			if(byteOne.length() == 1){	
+				byteOne = "0" + byteOne.toUpperCase();
+			}
+			
+			//Second byte of the op code
+			byteTwo = Integer.toHexString(chkIndex(operand, symtab) + chkRelative(operand, symtab, 3L, PC)).toUpperCase();
+			
+			//Order of operations within an expression
+			if(operand.contains("*")){
+				Long targetAddress = 0L;
+				Long disp = 0L;
+				if(operand.contains("-")){
+					//split the operands
+	    			String[] ops = operand.split("\\s*-\\s*");
+	    			//compute target address and disp
+	    			targetAddress = PC - Long.parseLong(ops[1].trim());;
+	    			disp = targetAddress - PC;
+	    		}
+	    		
+	    		else if(operand.contains("+")){
+	    			//split the operands
+	    			String[] ops = operand.split("\\s*\\+\\s*");
+	    			//compute target address and disp
+	    			targetAddress = PC + Long.parseLong(ops[1].trim());;
+	    			disp = targetAddress - PC;
+	    		}
+				
+				String display = String.format("%03X", disp);
+				if(display.length() > 3){
+					display = display.substring(display.length() - 3);
+				}
+				
+				format3Addr = display.toUpperCase();
+			}
+			
+			//RSUB operation
+			else if(operation.equals("RSUB")){
+				format3Addr = getStartAddress();
+				byteTwo = "";
+				//based on the length, append certain number of zeros for formatting
+				if(format3Addr.length() == 2){	
+					format3Addr = "00" + format3Addr;
+				}
+				if(format3Addr.length() == 1){	
+					format3Addr = "000" + format3Addr;
+				}
+				if(format3Addr.length() == 0){	
+					format3Addr = "0000" + format3Addr;
+				}
+			}
+			
+			/*// literal is in operand
+			else if(operand.startsWith("=")){
+				// location operandval operandval in calculation
+				PC += 3;
+				
+				// (TA) operandval in calculation
+				Long targetAddress = 0L;
+				
+				for(int i = 0; i < litTab.size(); i++){
+		    		if(litTab.get(i).Operation.equals(operand)){
+		    			targetAddress = litTab.get(i).PC;
+		    		}
+				}
+				
+				Long disp = targetAddress - PC;
+				String display = String.format("%03X", disp);
+				if(display.length() > 3){
+					display = display.substring(display.length() - 3);
+				}
+				format3Addr = display;	
+			}*/
+			
+			//Immediate addressing
+			else if(chkAddress(operand).equals(1)){
+				//add 3 to PC
+				PC += 3;				
+				Long targetAddress = 0L;				
+				boolean symUsed = false;
+				String operandval = operand.trim().substring(1);
+				//Look through the symbol table and find the operand
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(operandval)){
+		    			//assign the target address
+		    			targetAddress = Long.valueOf(symtab.Get(i).location);
+		    			symUsed = true;
+		    		}
+				}
+				
+				if(symUsed){
+					//Compute disp
+					Long disp = targetAddress - PC;
+					String display = String.format("%03X", disp);
+					if(display.length() > 3){
+						display = display.substring(display.length() - 3);
+					}
+					format3Addr = display;
+				}
+				
+				else{
+					Long lon = Long.parseLong(operandval);
+					String str = Long.toHexString(lon);
+					format3Addr = str.toUpperCase();
+					//based on the length, append certain number of zeros for formatting
+					if(str.length() == 2){	
+						format3Addr = "0" + str;
+					}
+					if(str.length() == 1){	
+						format3Addr = "00" + str;
+					}
+				} 
+			}
+			
+			//Indirect addressing
+			else if(chkAddress(operand).equals(2)){
+				//add 3 to the PC
+				PC += 3;				
+				Long targetAddress = 0L;				
+				String operandval = operand.trim().substring(1);
+				//Look through the symbol table and find the operand
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(operandval)){
+		    			//assign the target address
+		    			targetAddress = Long.valueOf(symtab.Get(i).location);
+		    		}
+				}
+				
+				//Compute disp
+				Long disp = targetAddress - PC;
+				String display = String.format("%03X", disp);
+				if(display.length() > 3){
+					display = display.substring(display.length() - 3);
+				}
+				format3Addr = display;
+			}
+			
+			//Indexed addressing
+			else if(chkIndex(operand, symtab).equals(8)){
+				String indexval = getIndexValue();
+				Long longIndexValue = Long.parseLong(indexval);							
+				Long targetAddress = 0L;
+				String[] ops = operand.split("\\s*,\\s*");
+				String symbol = ops[0].trim();
+				//Look through the symbol table and find the operand
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(symbol)){
+		    			//assign the target address
+		    			targetAddress = Long.valueOf(symtab.Get(i).location);
+		    		}
+				}
+				
+				//Compute disp for base relative addressing
+				String display = String.format("%03X", 0);
+				if(chkRelative(operand, symtab, 3L, PC).equals(4)){
+					Long baseRegister = 0L;
+					String baseval = getBaseValue().trim();
+					
+					if(baseval.startsWith("#")){
+						baseval = baseval.substring(1);
+					}
+					else if(baseval.startsWith("@")){
+						baseval = baseval.substring(1);
+					}
+					
+					boolean symfound = false;
+					for(int i = 0; i < symtab.size(); i++){
+			    		if(symtab.Get(i).symbolName.equals(baseval)){
+			    			//assign the base register
+			    			baseRegister = Long.valueOf(symtab.Get(i).location);
+			    			symfound = true;
+			    			break;
+			    		}
+					}
+					
+					if(!symfound){
+		    			baseRegister = Long.parseLong(baseval);
+					}
+					
+					Long disp = targetAddress - baseRegister;
+					display = String.format("%03X", disp);
+				}
+
+				//Compute disp for pc relative
+				else{
+					PC += 3;
+					Long disp = targetAddress - PC - longIndexValue;
+					display = String.format("%03X", disp);
+				}
+				
+				
+				format3Addr = display;
+				
+			}
+			
+			//PC relative addressing
+			else if(chkRelative(operand, symtab, 3L, PC).equals(2)){
+				//add 3 to the PC
+				PC += 3;				
+				Long targetAddress = 0L;
+				String symbol = operand.trim();
+				//Look through the symbol table and find the operand
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(symbol)){
+		    			//assign the target address
+		    			targetAddress = Long.valueOf(symtab.Get(i).location);
+		    		}
+				}
+				
+				//Compute disp
+				Long disp = targetAddress - PC;
+				String display = String.format("%03X", disp);
+				if(display.length() > 3){
+					display = display.substring(display.length() - 3);
+				}
+				format3Addr = display;		
+			}
+			
+			//Base relative addressing scheme
+			else if(chkRelative(operand, symtab, 3L, PC).equals(4)){	
+				//grab the base value
+				String stringBaseValue = getBaseValue();
+				Long baseRegister = 0L;
+				String baseval = getBaseValue().trim();
+				
+				if(stringBaseValue.startsWith("#")){
+					baseval = baseval.substring(1);
+				}
+				
+				else if(stringBaseValue.startsWith("@")){
+					baseval = baseval.substring(1);
+				}
+				
+				boolean symfound = false;
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(baseval)){
+		    			//assign the base register
+		    			baseRegister = Long.valueOf(symtab.Get(i).location);
+		    			symfound = true;
+		    			break;
+		    		}
+				}
+				
+				if(!symfound){
+	    			baseRegister = Long.parseLong(baseval);
+				}
+				
+				
+				Long targetAddress = 0L;
+				String[] ops = operand.split("\\s*,\\s*");
+				String symbol = ops[0].trim();
+				//Look through the symbol table and find the operand
+				for(int i = 0; i < symtab.size(); i++){
+		    		if(symtab.Get(i).symbolName.equals(symbol)){
+		    			//assign the target address
+		    			targetAddress = Long.valueOf(symtab.Get(i).location);
+		    		}
+				}
+				
+				//Compute disp
+				Long disp = targetAddress - baseRegister;
+				String display = String.format("%03X", disp);
+				format3Addr = display;
+			}
+
+			//calculate final object code
+			objCode = byteOne + byteTwo+ format3Addr;
+		}
+		
+		return objCode;
+	}//end of object code generation
+	
+	public Integer chkIndex(String operand, symTab symtab){
+		if(chkAddress(operand).equals(1)){
+			return 0;
+		}
+		
+		else if(chkAddress(operand).equals(2)){
+			return 0;
+		}
+		//if our operand ends with X then we have indexed addressing
+		else if((operand.trim().toUpperCase()).endsWith("X")){
+			return 8;
+		}
+		
+		return 0;
+	}
+	
+	//Determines addressing type based on n/i bits
+	public Integer chkAddress(String operand){
+		Integer addrVal = 0;
+		//immediate addressing
+		if((operand.trim().toUpperCase()).startsWith("#")){
+			addrVal = 1 + addrVal;
+		}
+		//indirect addressing (2 references)
+		else if((operand.trim().toUpperCase()).startsWith("@")){
+			addrVal = 2 + addrVal;
+		}
+		
+		else{
+			addrVal = 3 + addrVal;
+		}
+		
+		return addrVal;
+	}
+	
+	//Checks base/PC relative mode
+	public Integer chkRelative(String operand, symTab symtab, Long format, Long PC){
+		if(chkAddress(operand).equals(1)){
+			String operandval = operand.trim().substring(1);
+			//operand is #symbol
+			for(int i = 0; i < symtab.size(); i++){
+	    		if(symtab.Get(i).symbolName.equals(operandval)){
+	    			return 2;
+	    		}
+			}
+			return 0;
+		}
+		
+		Long targetAddress = 0L;
+		String[] ops = operand.split("\\s*,\\s*");
+		String symbol = ops[0].trim();
+		//Look through the symbol table and find the operand
+		for(int i = 0; i < symtab.size(); i++){
+    		if(symtab.Get(i).symbolName.equals(symbol)){
+    			//assign the target address
+    			targetAddress = Long.valueOf(symtab.Get(i).location);
+    		}
+		}
+		
+		/*for(int i = 0; i < litTab.size(); i++){
+    		if(litTab.Get(i).Operation.equals(operand)){
+    			targetAddress = litTab.Get(i).location;
+    		}
+		}*/
+		
+		//define the ranges
+		Long dispPCRange = 0L;
+		dispPCRange = targetAddress - PC + format;
+		
+		Long baseRegister = 0L;
+		String baseval = getBaseValue().trim();
+		
+		if(baseval.startsWith("#")){
+			baseval = baseval.substring(1);
+		}
+		else if(baseval.startsWith("@")){
+			baseval = baseval.substring(1);
+		}
+		
+		boolean symfound = false;
+		for(int i = 0; i < symtab.size(); i++){
+    		if(symtab.Get(i).symbolName.equals(baseval)){
+    			//assign the base register
+    			baseRegister = Long.valueOf(symtab.Get(i).location);
+    			symfound = true;
+    			break;
+    		}
+		}
+		
+		if(!symfound){
+    			baseRegister = Long.parseLong(baseval);
+		}
+		
+		Long dispbaseRange = 0L;
+		dispbaseRange = targetAddress - PC + format + baseRegister;
+		
+		if(dispPCRange < 2048 && dispPCRange > -2048){
+			return 2;
+		}
+		
+		else if(dispbaseRange < 4095 && dispbaseRange > -4095){
+			return 4;
+		}
+		
+		return 0;
+	}
+}
+
+//op
+
+package assembler;
+
+public class op {
+	String mnemonic;
+	Integer format;
+	Integer opcode;
+	
+	op(String m, Integer f, Integer o){
+		mnemonic = m;
+		format = f;
+		opcode = o;
+	}
+}
+
+//opTab
+
+package assembler;
+
+import java.util.ArrayList;
+
+public class opTab {
+	ArrayList<op> opTab;
+	opTab(){
+		//declare the symbol table
+		opTab = new ArrayList<op>();
+		opTab.add(new op("ADD",3,0x18));
+		opTab.add(new op("ADDF",3,0x58));
+		opTab.add(new op("ADDR",2,0x90));
+		opTab.add(new op("AND",3,0x40));
+		opTab.add(new op("CLEAR",2,0xB4));
+		opTab.add(new op("COMP",3, 0x28));
+		opTab.add(new op("COMPF",3, 0x88));
+		opTab.add(new op("COMPR",2, 0xA0));
+		opTab.add(new op("DIV",3, 0x24));
+		opTab.add(new op("DIVF",3, 0x64));
+		opTab.add(new op("DIVR",3,0x9C));
+		opTab.add(new op("FIX",1, 0xC4));
+		opTab.add(new op("FLOAT",1, 0xC0));
+		opTab.add(new op("HIO",1,0xF4));
+		opTab.add(new op("J",3,0x3C));
+		opTab.add(new op("JEQ",3,0x30));
+		opTab.add(new op("JGT",3,0x34));
+		opTab.add(new op("JLT",3,0x38));
+		opTab.add(new op("JSUB",3,0x48));
+		opTab.add(new op("LDA",3,0x00));
+		opTab.add(new op("LDB",3,0x68));
+		opTab.add(new op("LDCH",3,0x50));
+		opTab.add(new op("LDF",3,0x70));
+		opTab.add(new op("LDL",3,0x08));
+		opTab.add(new op("LDS",3,0x6C));
+		opTab.add(new op("LDT",3,0x74));
+		opTab.add(new op("LDX",3,0x04));
+		opTab.add(new op("LPS",3,0xD0));
+		opTab.add(new op("MUL",3,0x20));
+		opTab.add(new op("STA",3,0x0C));
+		opTab.add(new op("MULF",3,0x60));
+		opTab.add(new op("MULR",2,0x98));
+		opTab.add(new op("NORM",1,0xC8));
+		opTab.add(new op("OR",3,0x44));
+		opTab.add(new op("RD",3,0xD8));
+		opTab.add(new op("RMO",2,0xAC));
+		opTab.add(new op("RSUB",3,0x4C));
+		opTab.add(new op("SHIFTL",2,0xA4));
+		opTab.add(new op("SHIFTR",2,0xA8));
+		opTab.add(new op("SIO",1,0xF0));
+		opTab.add(new op("SSK",3,0xEC));
+		opTab.add(new op("STB",3,0x78));
+		opTab.add(new op("STCH",3,0x54));
+		opTab.add(new op("STF",3,0x80));
+		opTab.add(new op("STI",3,0xD4));
+		opTab.add(new op("STL",3,0x14));
+		opTab.add(new op("STS",3,0x7C));
+		opTab.add(new op("STSW",3,0xE8));
+		opTab.add(new op("STT",3,0x84));
+		opTab.add(new op("STX",3,0x10));
+		opTab.add(new op("SUB",3,0x1C));
+		opTab.add(new op("SUBF",3,0x5c));
+		opTab.add(new op("SUBR",2,0x94));
+		opTab.add(new op("SVC",2,0xB0));
+		opTab.add(new op("TD",3,0xE0));
+		opTab.add(new op("TIO",1,0xF8));
+		opTab.add(new op("TIX",3,0x2C));
+		opTab.add(new op("TIXR",2,0xB8));
+		opTab.add(new op("WD",3,0xDC));
+	}
+	
+	Boolean hasOp(String check){
+		for(int i = 0; i<opTab.size(); i++){
+			if(opTab.get(i).mnemonic.equals(check)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	Integer getOpcode(String check){
+		for(int i = 0; i<opTab.size(); i++){
+			if(opTab.get(i).mnemonic.equals(check)){
+				return opTab.get(i).opcode;
+			}
+		}
+		//this should not happen
+		return 0;
+	}
+	
+	Integer getFormat(String check){
+		for(int i = 0; i<opTab.size(); i++){
+			if(opTab.get(i).mnemonic.equals(check)){
+				return opTab.get(i).format;
+			}
+		}
+		//this should not happen
+		return 0;
+	}
+}
+
+//parse
+
+package assembler;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+public class parse{
+	String fileName;
+	String line;
+	location LOC;
+	opTab operators;
+	
+	public  parse(String name, opTab opers){
+		this.fileName = name;
+		this.line = null;
+		LOC = new location(0);
+		operators = opers;
+	}
+	
+	public void parser(symTab symbols){
+		 try {
+	            // FileReader reads text files in the default encoding.
+	            FileReader fileReader = new FileReader(fileName);
+	           PrintWriter writer = new PrintWriter("intermediate.txt");
+	            
+	            // Always wrap FileReader in BufferedReader.
+	            BufferedReader bufferedReader = 
+	                new BufferedReader(fileReader);
+	            while((line = bufferedReader.readLine()) != null) {
+	            	//take each line in the txt file line by line
+	            	for (String retval: line.split("\n")) {
+	            		//split the line by tabs for each field
+	            		String [] splitter = retval.split("\t", -1);
+	            		//check to see if the line is a comment
+	            		if(splitter[0].startsWith(".")){
+            				}
+	            		//otherwise check each field
+	            		else{
+	            			//check to see if there are any tabs to separate anything
+	            			if(1==splitter.length){
+	            				//otherwise print the blank line
+	            				writer.print(splitter[0]);
+	            			}
+	            			//if there are at least 3 entities separated by tab
+	            			if(3<=splitter.length){
+	            				writer.print(Integer.toHexString(LOC.locator)+"\t");
+	            				//check if there is something in the label field, if there is identify it, if not print out a tab
+	            				if(splitter[0].length()!=0){
+		            			//add the label to the symbol tables
+		            			symbols.apend(splitter[0], LOC.locator);
+	            				}
+		            			writer.print(splitter[0]+"\t");
+	            				//check if there is anything in the operator field, if there is identify it, if not print out a tab
+	            				writer.print(splitter[1]+"\t");
+	            				//check if there is anything in the operand field, if there is identify it, if not print out a tab
+	            				if(splitter[2].length()!=0){
+	            					LOC.update(splitter[1], operators, splitter[2]);
+	            				}
+            					writer.print(splitter[2]+"\t");
+	            				
+	            			}
+	            			//if there are four entities separated by tab then there is a comment
+	            			if(4<=splitter.length){
+	            				//check if there is anything in the comment field, if there is identify it, if not print out a tab
+	            				if(splitter[3].length()!=0){
+	            					writer.print(splitter[3]+"\t");
+	            				}
+	            			}
+	            		}
+		           			writer.println("");
+	            		}
+	            	
+	            }
+	            // Always close files.
+	            bufferedReader.close();         
+	            writer.close();
+		 }
+	        catch(FileNotFoundException ex) {
+	            System.out.println(
+	                "Unable to open file '" + 
+	                fileName + "'");                
+	        }
+	        catch(IOException ex) {
+	            System.out.println(
+	                "Error reading file '" 
+	                + fileName + "'");                  
+	            // Or we could just do this: 
+	            // ex.printStackTrace();
+	        }
+	}
+	
+	public location getLocation(){
+		return LOC;
+	}
+}
+
+//secondparse
+
+/*
+Author: Myson Burch
+Xukai Zou
+CS 30000
+Assembler Final Project
+2 May 2017
+*/
+package assembler;
+
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+//import java.io.Writer;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+
+//second pass of the assembler
+public class secondparse {
+	private charTab characterTab;
+	//private Long totalOffset = 0L;
+	private Long currentOffset = 0L;
+	//private Boolean knownControlSectionStartingPlace = false;
+	//private ControlSection currentControlSection;
+	
+	//Case switch statements for general purpose registers
+	private String getRegVals(String operand){
+		switch (operand) {
+		case "A" :
+			return "0";
+		case "X" :
+			return "1";
+		case "L" :
+			return "2";
+		case "B" :
+			return "3";
+		case "S" :
+			return "4";
+		case "T" :
+			return "5";
+		case "F" :
+			return "6";
+		case "PC" :
+			return "8";
+		case "SW" :
+			return "9";
+		default :
+			return "";
+		}
+	}
+		
+	
+	public Boolean assemble(String firstPassOutputFileName, symTab symtab, location LOC){	
+		//elements to read and write to the text files
+		characterTab = new charTab();
+		BufferedWriter bw = null;
+		BufferedReader reader = null;
+		
+		//header string
+		StringBuilder headerRecord = new StringBuilder();
+		//text record string
+		StringBuilder textRecord = new StringBuilder();
+		//end record string
+		StringBuilder endRecord = new StringBuilder();
+		
+		//maximum in half bits
+		Integer maxrecord = 31;
+		//length of the text record
+		Integer currentLen = 0;
+		//temporary length
+		Integer tempcurrLen = 0;
+		//length of the program
+		Integer totalLen = 0;
+		//temporary object code string
+		StringBuilder tempobjCode = new StringBuilder();
+		
+		//variables to keep track of record components 
+		Integer headerCtr = 0;
+		Long tempLocation = 0L;
+		Long startLoc = 0L;
+		
+		try {
+			//read the immediate file
+		    reader = new BufferedReader(new FileReader(firstPassOutputFileName));
+		    String text = null;
+		    
+		    
+		    // New file with object code extension
+		    File file = new File(firstPassOutputFileName + ".objprog");
+		    //if file DNE, create one
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            
+            //elements to write to the new file
+            FileWriter fw = new FileWriter(file.getAbsoluteFile());
+            bw = new BufferedWriter(fw);
+            
+            //create a new object code generator instance
+    		objcodegen objcodegenerator = new objcodegen();
+
+            //boolean to detect the START in the AL
+            Boolean firstLine = true;            
+            
+            //while not at the end of the file
+		    while ((text = reader.readLine()) != null) {
+		    	//empty input
+		    	if(text.length() == 0){
+		    		continue;
+		    	}
+		    		    	
+		    	//parse the line into the components (location, operation etc.)
+		    	firstpassoutput line = new firstpassoutput(text);
+		    		    		    	
+		    	//look for the START in the file at the beginning
+		    	if(line.operation.equals("START") && firstLine){
+		    		try{
+		    			//grab the operand to set the base value
+		    			String value = line.operand;
+			    		objcodegenerator.setBaseValue(value);
+			    		
+			    		//Write the header record of zeros and length of the file
+			    		//Length of the file will be written later
+			    		//bw.write("H^" + line.label + '\t' + "^" + line.location + "^");
+			    		headerRecord.append("H^" + line.label + '\t' + "^" + String.format("%06X", line.location) + "^");
+			    		//bw.newLine();
+			    		headerCtr = 1;
+			    		startLoc = line.location;
+			    		continue;
+		    		}
+		    		
+		    		catch(Exception e){
+		    			System.err.println("Invalid START address");
+		    			return false;
+		    		}
+		    		
+		    		finally{		    		
+		    			firstLine = false;
+		    		}
+		    	}
+		    	
+		    	//else write a empty title Header record
+		    	else{
+		    		if (headerCtr == 0){
+		    			//bw.write("H^" + "DEFAULT" + '\t' + "^" + String.format("%06X",line.location) + "^");
+		    			headerRecord.append("H^" + "DEFAULT" + '\t' + "^" + String.format("%06X",line.location) + "^");
+		    			//bw.newLine();
+		    			headerCtr = 1;
+		    			startLoc = line.location;
+		    		}
+		    	}
+		    	
+		    	//catch for the JST typo error in the macros.txt file
+		    	if(line.operation.equals("JST")){
+		    		line.operation = "JLT";
+		    	}
+		    	
+		    	//LDX operation
+		    	if(line.operation.equals("LDX") || line.operation.equals("+LDX")){
+		    		//initialize with the index register value
+		    		String value = line.operand.substring(1);
+		    		objcodegenerator.setIndexValue(value);
+		    	}
+		    	
+		    	//LDB operation
+		    	if(line.operation.equals("LDB") || line.operation.equals("+LDB")){
+		    		//initialize with the base register value
+		    		String value = line.operand.substring(1);
+		    		objcodegenerator.setBaseValue(value);
+		    	}
+		    	
+		    	//END operation
+		    	if(line.operation.equals("END")){
+		    		continue;
+		    	}
+		    	
+		    	//checking if the operation is in the op table
+		    	opTab currOpTable = new opTab();
+		    	if(currOpTable.hasOp(line.operation)){
+		    		//grab the opcode for that operation
+		    		Integer opCode = currOpTable.getOpcode(line.operation);
+		    				    		
+	    			//Format 1 (just the opcode as the object code, 1 byte, no memory reference)
+	    			if(currOpTable.getFormat(line.operation).equals(1)){
+	    				//grab hexadecimal value of the opcode
+	    				String hexval = String.format("%02X", opCode);
+	    				line.objCode = hexval;
+		    		}//end of format 1 instructions
+	    			
+		    		//Format 2 (2 bytes, no memory reference)
+		    		if(currOpTable.getFormat(line.operation).equals(2)){
+	    				//grab hexadecimal value of the opcode
+		    			String hexval = String.format("%02X", opCode);		    			
+		    			
+		    			//Go through all the format 2 operations
+		    			//Format 2 operations with one argument
+		    			if(line.operation.equals("CLEAR") || line.operation.equals("TIXR")){
+		    				hexval += getRegVals(line.operand) + "0"; 
+		    				line.objCode = hexval;
+		    			}
+		    			//Format 2 operations with two arguments
+		    			if(line.operation.equals("ADDR") ||line.operation.equals("DIVR")|| line.operation.equals("COMPR")  ||line.operation.equals("MULR") ||line.operation.equals("SUBR")||line.operation.equals("RMO") ){
+		    				String[] ops = line.operand.split("\\s*,\\s*");
+		    				hexval += getRegVals(ops[0].trim()) + getRegVals(ops[1].trim());
+		    				line.objCode = hexval;
+		    			}
+		    			
+		    		}//end of format 2 instructions
+		    		
+			    	//Format 3 (3 bytes, default SIC/XE format)
+			    	else{
+			    		line.objCode = objcodegenerator.ObjCodeGenerate(line.location + currentOffset, line.operation, line.operand, symtab);
+			    	}
+		    		
+		    	}
+		   
+			    //Format 4 (4 bytes, extended SIC/XE for more space)
+			    else if(line.operation.startsWith("+")){
+			    	line.objCode = objcodegenerator.ObjCodeGenerate(line.location + currentOffset, line.operation, line.operand, symtab);
+			    }
+		    	
+		    	//Looking for literals
+		    	else if(line.operation.startsWith("=")){
+		    		String literal = line.operation.trim().toUpperCase().substring(3, line.operation.length() - 1);
+		    		//character string literal
+		    		if(line.operation.substring(1).startsWith("C")){
+		    			StringBuffer buffer = new StringBuffer();
+		    			//encode the string into array of bytes
+		    			byte[] bytes = literal.getBytes("US-ASCII");
+		    			for(int i = 0; i < bytes.length; i++){
+		    				//determines the character representation for a specific digit in the specified radix
+		    				buffer.append(Character.forDigit((bytes[i] >> 4) & 0xF, 16));
+		    				buffer.append(Character.forDigit((bytes[i] & 0xF), 16));
+		    			}
+		    			//store that object code
+		    			line.objCode = buffer.toString().toUpperCase();
+		    		}
+		    		//hexadecimal literal
+		    		else if(line.operation.substring(1).toUpperCase().startsWith("X")){
+		    			//store that object code
+		    			line.objCode = literal.toUpperCase();
+		    		}
+		    	}
+		    	
+		    	//other operations that do not generate object code
+		    	else if(line.operation.equals("RESB")){
+		    		line.objCode = "";
+		    	}
+		    	
+		    	else if(line.operation.equals("RESW")){
+		    		line.objCode = "";
+		    	}
+		    	else if(line.operation.equals("BYTE")){
+		    		String helper = line.operand;
+		    		int h = helper.length();
+		    		if(helper.startsWith("X")){
+		    			line.objCode = helper.substring(2,h-1);
+		    		}
+		    		else{
+		    			helper = helper.substring(2,h-1);
+		    			h = helper.length();
+		    			line.objCode = "";
+		    			for(int i = 0; i<h; i++){
+		    				System.out.println(helper.substring(0,1));
+		    				int indexed = characterTab.getIndex(helper.substring(0,1));
+		    				line.objCode += Integer.toHexString(characterTab.chars.get(indexed).dec);
+		    				helper = helper.substring(1);
+		    			}
+		    		}
+		    	}
+		    	else if(line.operation.equals("WORD")){
+		    		line.objCode = line.operand;
+		    	}
+		    	//error handling
+		    	else{
+		    		System.err.println("Invalid operation: " + line.operation);
+		    		//set that object code to blank so the assembler completes(even with incorrect object code)
+		    		line.objCode = "";
+		    		//return false;
+		    	}
+		    	
+		    	//use this line to begin generating object program
+		    	//if there is a line that doesn't generate object code or we are at the maximum record length
+		    	if(line.objCode.equals("")|| (currentLen + line.objCode.length() >= 2*maxrecord)){
+		    		//bw.newLine();
+		    		
+		    		//if this line didn't generate object code (multiple times)
+		    		if (line.objCode.equals("")&&currentLen ==0){
+		    			currentLen = 0;
+		    		}
+		    		//this is the first line that didn't generate object code
+		    		else if (line.objCode.equals("")){
+		    			/*bw.write("T^" + String.format("%06X", tempLocation) + "^" 
+		    					+ String.format("%02X",currentLen) + tempobjCode);
+		    			*/
+		    			textRecord.append("T^" + String.format("%06X", tempLocation) + "^" 
+		    					+ String.format("%02X",currentLen/2) + tempobjCode.toString());
+		    			
+		    			tempobjCode.setLength(0);
+		    			currentLen = 0;
+		    		}
+		    		//otherwise there is overflow and 
+		    		//write what we had to the record and move to the next line
+		    		else {
+		    			/*bw.write("T^" + String.format("%06X", tempLocation) + "^" 
+		    					+ String.format("%02X",currentLen) + tempobjCode);
+		    			*/
+		    			textRecord.append("T^" + String.format("%06X", tempLocation) + "^" 
+		    					+ String.format("%02X",currentLen/2) + tempobjCode.toString() + '\n');
+		    			
+		    			//bw.newLine();
+		    			
+		    			//store stuff for the portion of code that went over the bound for the next line
+		    			tempLocation = line.location;
+		    			tempobjCode.setLength(0);
+		    			//append new object code
+		    			tempobjCode.append("^"+line.objCode.toString());
+		    			currentLen = 0;
+		    			//increment the length for the current record
+		    			currentLen += line.objCode.length();
+		    		}
+		    		
+		    		//System.out.println(tempobjCode);
+		    		//currentLen = 0;
+		    	}
+		    	else{
+		    		//at the start of a new text record
+		    		if(currentLen == 0){
+		    			//bw.newLine();
+		    			textRecord.append('\n');
+		    			tempobjCode.setLength(0);
+		    			//write the text record
+		    			//bw.write("T^" + String.format("%06X", line.location) + "^");
+		    			//grab a temporary location
+		    			tempLocation = line.location;
+		    			//append new object code
+		    			//bw.write("^"+line.objCode);
+		    			tempobjCode.append("^"+line.objCode.toString());
+		    			//increment the length for the current record
+		    			currentLen += line.objCode.length();
+		    			tempcurrLen = currentLen;
+		    			//increment the total length
+		    			totalLen += line.objCode.length();
+		    		}
+		    		else{
+		    			if(currentLen + line.objCode.length() < 2*maxrecord){
+			    			//append new object code as long as we are within the record length
+			    			//bw.write("^"+line.objCode);
+			    			tempobjCode.append("^"+line.objCode.toString());
+			    			//increment the length for the current record
+			    			currentLen += line.objCode.length();
+			    			tempcurrLen = currentLen;
+			    			//increment the total length
+			    			totalLen += line.objCode.length();
+		    			}	
+		    		}
+		    		
+		    		//bw.write(line.objCode);
+		    		//bw.newLine();
+		    		
+		    	}//end of writing text record
+	    			    		
+		    }//end of reading the file (end of while)
+		    
+		    //just in case we ended the file and did not reach a bound on the length of the record and had object code still to write
+		    if (tempobjCode.length()!=0){
+		    	/*bw.write("T^" + String.format("%06X", tempLocation) + "^" 
+    					+ String.format("%02X",tempcurrLen) + tempobjCode);
+		    	*/
+		    	textRecord.append("T^" + String.format("%06X", tempLocation) + "^" 
+    					+ String.format("%02X",tempcurrLen) + tempobjCode.toString() + '\n');
+		    	
+    			tempobjCode.setLength(0);
+    			currentLen = 0;
+		    }
+		    
+		    headerRecord.append(String.format("%06X", LOC.locator));
+		    endRecord.append("E^"+String.format("%06X", startLoc));
+		    
+		    /*bw.newLine();
+		    //insert program length and end of record
+		    bw.write("E^"+String.format("%06X", startLoc));*/
+		    
+		    bw.write(headerRecord.toString()+textRecord.toString()+'\n'+endRecord.toString());
+            
+		}
+		
+		//catches for exceptions
+		catch (IOException e) {
+		    e.printStackTrace();
+		}
+		
+		//close connections
+		finally {
+			try {
+		        if (reader != null) {
+		            reader.close();
+		            bw.close();
+		        }
+		    }
+		    catch (IOException e) {}
+		}
+		
+		/*Writer output = null;
+		try {
+			output = new BufferedWriter(new FileWriter(firstPassOutputFileName + ".objprog", true));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			output.append("New Line!");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			output.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		
+		return true;
+	}
+	
+}//end of second pass
+
+//symbol
+
+package assembler;
+
+public class symbol {
+	String symbolName;
+	Integer location;
+	
+	symbol(String n, Integer l){
+		symbolName = n;
+		location = l;
+	}
+}
+
+//symTab
+package assembler;
+
+import java.util.ArrayList;
+
+public class symTab {
+	ArrayList<symbol> SymTab;
+	
+	symTab(){
+		//declare the symbol table
+		SymTab = new ArrayList<symbol>();
+	}
+	
+	void apend(String sym, int loc){
+		SymTab.add(new symbol(sym, loc));
+	}
+	
+	void printTable(){
+		for (int i = 0; i < SymTab.size(); i++) {
+			System.out.println(SymTab.get(i).symbolName+"\t"+Integer.toHexString(SymTab.get(i).location));
+		}
+	}
+	
+	Boolean hasSymbol(String check){
+		for(int i = 0; i<SymTab.size(); i++){
+			if(SymTab.get(i).symbolName.equals(check)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	Integer getLocation(String check){
+		for(int i = 0; i<SymTab.size(); i++){
+			if(SymTab.get(i).symbolName.equals(check)){
+				return SymTab.get(i).location;
+			}
+		}
+		//this should not happen
+		return 0;
+	}
+	
+	Integer size(){
+		return SymTab.size();
+	}
+	
+	symbol Get(Integer num){
+		return SymTab.get(num);
+	}
+}
+
+
