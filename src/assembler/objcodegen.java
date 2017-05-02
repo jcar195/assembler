@@ -92,17 +92,6 @@ public class objcodegen {
 				format4Addr = display.toUpperCase();
 			}//end of expression calculation
 			
-			/*// generate address bytes
-			else if(contSects.size() > 1){
-				if(!knownControlSectionStartingPlace){
-					for(int i = 0; i < currentControlSection.ExtRefTab.size(); i++){
-						if(operand.contains(currentControlSection.ExtRefTab.get(i).Label)){
-							format4Addr = "00000";
-						}
-					}
-				}
-			}*/
-			
 			//Immediate addressing
 			else if(chkAddress(operand).equals(1)){
 				//add 4 to the PC
@@ -537,12 +526,6 @@ public class objcodegen {
     			targetAddress = Long.valueOf(symtab.Get(i).location);
     		}
 		}
-		
-		/*for(int i = 0; i < litTab.size(); i++){
-    		if(litTab.Get(i).Operation.equals(operand)){
-    			targetAddress = litTab.Get(i).location;
-    		}
-		}*/
 		
 		//define the ranges
 		Long dispPCRange = 0L;
