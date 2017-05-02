@@ -18,7 +18,11 @@ import java.io.BufferedWriter;
 
 //second pass of the assembler
 public class secondparse {
+	private charTab characterTab;
+	//private Long totalOffset = 0L;
 	private Long currentOffset = 0L;
+	//private Boolean knownControlSectionStartingPlace = false;
+	//private ControlSection currentControlSection;
 	
 	//Case switch statements for general purpose registers
 	private String getRegVals(String operand){
@@ -47,8 +51,9 @@ public class secondparse {
 	}
 		
 	
-	public Boolean assemble(String firstPassOutputFileName, symTab symtab){	
+	public Boolean assemble(String firstPassOutputFileName, symTab symtab, location LOC){	
 		//elements to read and write to the text files
+		characterTab = new charTab();
 		BufferedWriter bw = null;
 		BufferedReader reader = null;
 		
@@ -246,35 +251,30 @@ public class secondparse {
 		    	else if(line.operation.equals("RESW")){
 		    		line.objCode = "";
 		    	}
-		    	
-		    	//BYTE operation
 		    	else if(line.operation.equals("BYTE")){
-		    		//if we are storing a character value
-		    		if(line.operand.startsWith("C")){
-		    			//buffer for the object code
-		    			StringBuffer objCodebuffer = new StringBuffer();
-		    			String charSubstring = line.operand.substring(2, line.operation.length() + 1);
-		    			//encode the string into a sequence of bytes
-		    			byte[] bytes = charSubstring.getBytes("US-ASCII");
-		    			//for each byte, append for the object code 
-		    			for(int i = 0; i < bytes.length; i++){
-		    				//determines the character representation for a specific digit in the specified radix
-		    				objCodebuffer.append(Character.forDigit((bytes[i] >> 4) & 0xF, 16));
-		    				objCodebuffer.append(Character.forDigit((bytes[i] & 0xF), 16));
-		    			}
-		    			//final object code
-		    			line.objCode = objCodebuffer.toString().toUpperCase();
+		    		String helper = line.operand;
+		    		int h = helper.length();
+		    		if(helper.startsWith("X")){
+		    			line.objCode = helper.substring(2,h-1);
 		    		}
-		    		//hexadecimal byte
-		    		else if(line.operand.startsWith("X")){
-		    			String charSubstring = line.operand.substring(2, line.operation.length());
-		    			line.objCode = charSubstring;
+		    		else{
+		    			helper = helper.substring(2,h-1);
+		    			h = helper.length();
+		    			line.objCode = "";
+		    			for(int i = 0; i<h; i++){
+		    				System.out.println(helper.substring(0,1));
+		    				int indexed = characterTab.getIndex(helper.substring(0,1));
+		    				line.objCode += Integer.toHexString(characterTab.chars.get(indexed).dec);
+		    				helper = helper.substring(1);
+		    			}
 		    		}
 		    	}
-		    	
+		    	else if(line.operation.equals("WORD")){
+		    		line.objCode = line.operand;
+		    	}
 		    	//error handling
 		    	else{
-		    		//System.err.println("Invalid operation: " + line.operation);
+		    		System.err.println("Invalid operation: " + line.operation);
 		    		//set that object code to blank so the assembler completes(even with incorrect object code)
 		    		line.objCode = "";
 		    		//return false;
@@ -295,7 +295,7 @@ public class secondparse {
 		    					+ String.format("%02X",currentLen) + tempobjCode);
 		    			*/
 		    			textRecord.append("T^" + String.format("%06X", tempLocation) + "^" 
-		    					+ String.format("%02X",currentLen) + tempobjCode.toString());
+		    					+ String.format("%02X",currentLen/2) + tempobjCode.toString());
 		    			
 		    			tempobjCode.setLength(0);
 		    			currentLen = 0;
@@ -307,7 +307,7 @@ public class secondparse {
 		    					+ String.format("%02X",currentLen) + tempobjCode);
 		    			*/
 		    			textRecord.append("T^" + String.format("%06X", tempLocation) + "^" 
-		    					+ String.format("%02X",currentLen) + tempobjCode.toString() + '\n');
+		    					+ String.format("%02X",currentLen/2) + tempobjCode.toString() + '\n');
 		    			
 		    			//bw.newLine();
 		    			
@@ -375,7 +375,7 @@ public class secondparse {
     			currentLen = 0;
 		    }
 		    
-		    headerRecord.append(String.format("%06X", totalLen));
+		    headerRecord.append(String.format("%06X", LOC.locator));
 		    endRecord.append("E^"+String.format("%06X", startLoc));
 		    
 		    /*bw.newLine();

@@ -91,7 +91,18 @@ public class objcodegen {
 				
 				format4Addr = display.toUpperCase();
 			}//end of expression calculation
-						
+			
+			/*// generate address bytes
+			else if(contSects.size() > 1){
+				if(!knownControlSectionStartingPlace){
+					for(int i = 0; i < currentControlSection.ExtRefTab.size(); i++){
+						if(operand.contains(currentControlSection.ExtRefTab.get(i).Label)){
+							format4Addr = "00000";
+						}
+					}
+				}
+			}*/
+			
 			//Immediate addressing
 			else if(chkAddress(operand).equals(1)){
 				//add 4 to the PC
@@ -270,7 +281,28 @@ public class objcodegen {
 				}
 			}
 			
-						
+			/*// literal is in operand
+			else if(operand.startsWith("=")){
+				// location operandval operandval in calculation
+				PC += 3;
+				
+				// (TA) operandval in calculation
+				Long targetAddress = 0L;
+				
+				for(int i = 0; i < litTab.size(); i++){
+		    		if(litTab.get(i).Operation.equals(operand)){
+		    			targetAddress = litTab.get(i).PC;
+		    		}
+				}
+				
+				Long disp = targetAddress - PC;
+				String display = String.format("%03X", disp);
+				if(display.length() > 3){
+					display = display.substring(display.length() - 3);
+				}
+				format3Addr = display;	
+			}*/
+			
 			//Immediate addressing
 			else if(chkAddress(operand).equals(1)){
 				//add 3 to PC
@@ -352,7 +384,7 @@ public class objcodegen {
 				//Compute disp for base relative addressing
 				String display = String.format("%03X", 0);
 				if(chkRelative(operand, symtab, 3L, PC).equals(4)){
-					Long baseReg = 0L;
+					Long baseRegister = 0L;
 					String baseval = getBaseValue().trim();
 					
 					if(baseval.startsWith("#")){
@@ -366,17 +398,17 @@ public class objcodegen {
 					for(int i = 0; i < symtab.size(); i++){
 			    		if(symtab.Get(i).symbolName.equals(baseval)){
 			    			//assign the base register
-			    			baseReg = Long.valueOf(symtab.Get(i).location);
+			    			baseRegister = Long.valueOf(symtab.Get(i).location);
 			    			symfound = true;
 			    			break;
 			    		}
 					}
 					
 					if(!symfound){
-		    			baseReg = Long.parseLong(baseval);
+		    			baseRegister = Long.parseLong(baseval);
 					}
 					
-					Long disp = targetAddress - baseReg;
+					Long disp = targetAddress - baseRegister;
 					display = String.format("%03X", disp);
 				}
 
@@ -419,7 +451,7 @@ public class objcodegen {
 			else if(chkRelative(operand, symtab, 3L, PC).equals(4)){	
 				//grab the base value
 				String stringBaseValue = getBaseValue();
-				Long baseReg = 0L;
+				Long baseRegister = 0L;
 				String baseval = getBaseValue().trim();
 				
 				if(stringBaseValue.startsWith("#")){
@@ -434,14 +466,14 @@ public class objcodegen {
 				for(int i = 0; i < symtab.size(); i++){
 		    		if(symtab.Get(i).symbolName.equals(baseval)){
 		    			//assign the base register
-		    			baseReg = Long.valueOf(symtab.Get(i).location);
+		    			baseRegister = Long.valueOf(symtab.Get(i).location);
 		    			symfound = true;
 		    			break;
 		    		}
 				}
 				
 				if(!symfound){
-	    			baseReg = Long.parseLong(baseval);
+	    			baseRegister = Long.parseLong(baseval);
 				}
 				
 				
@@ -457,7 +489,7 @@ public class objcodegen {
 				}
 				
 				//Compute disp
-				Long disp = targetAddress - baseReg;
+				Long disp = targetAddress - baseRegister;
 				String display = String.format("%03X", disp);
 				format3Addr = display;
 			}
@@ -483,7 +515,7 @@ public class objcodegen {
 		}
 		
 		return 0;
-	}//end of index check
+	}
 	
 	//Determines addressing type based on n/i bits
 	public Integer chkAddress(String operand){
@@ -502,7 +534,7 @@ public class objcodegen {
 		}
 		
 		return addrVal;
-	}//end of address check
+	}
 	
 	//Checks base/PC relative mode
 	public Integer chkRelative(String operand, symTab symtab, Long format, Long PC){
@@ -528,11 +560,17 @@ public class objcodegen {
     		}
 		}
 		
+		/*for(int i = 0; i < litTab.size(); i++){
+    		if(litTab.Get(i).Operation.equals(operand)){
+    			targetAddress = litTab.Get(i).location;
+    		}
+		}*/
+		
 		//define the ranges
 		Long dispPCRange = 0L;
 		dispPCRange = targetAddress - PC + format;
 		
-		Long baseReg = 0L;
+		Long baseRegister = 0L;
 		String baseval = getBaseValue().trim();
 		
 		if(baseval.startsWith("#")){
@@ -546,18 +584,18 @@ public class objcodegen {
 		for(int i = 0; i < symtab.size(); i++){
     		if(symtab.Get(i).symbolName.equals(baseval)){
     			//assign the base register
-    			baseReg = Long.valueOf(symtab.Get(i).location);
+    			baseRegister = Long.valueOf(symtab.Get(i).location);
     			symfound = true;
     			break;
     		}
 		}
 		
 		if(!symfound){
-    			baseReg = Long.parseLong(baseval);
+    			baseRegister = Long.parseLong(baseval);
 		}
 		
 		Long dispbaseRange = 0L;
-		dispbaseRange = targetAddress - PC + format + baseReg;
+		dispbaseRange = targetAddress - PC + format + baseRegister;
 		
 		if(dispPCRange < 2048 && dispPCRange > -2048){
 			return 2;
@@ -568,5 +606,5 @@ public class objcodegen {
 		}
 		
 		return 0;
-	}//end of relative check
+	}
 }

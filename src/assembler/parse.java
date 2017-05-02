@@ -90,4 +90,8 @@ public class parse{
 	            // ex.printStackTrace();
 	        }
 	}
+	
+	public location getLocation(){
+		return LOC;
+	}
 }

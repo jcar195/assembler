@@ -1,3 +1,11 @@
+/*
+Author: John Carillo
+Xukai Zou
+CS 30000
+Assembler Final Project
+2 May 2017
+*/
+
 package assembler;
 
 import java.io.BufferedReader;
